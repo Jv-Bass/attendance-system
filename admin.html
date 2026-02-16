@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System - Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .back-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        
+        .stat-card h3 {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .stat-card.checked-in .value {
+            color: #10b981;
+        }
+        
+        .stat-card.checked-out .value {
+            color: #ef4444;
+        }
+        
+        .filters {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+        
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+        
+        .tab:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 14px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f8fafc;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        tr:hover {
+            background: #f8fafc;
+        }
+        
+        td {
+            font-size: 14px;
+            color: #334155;
+        }
+        
+        .employee-name {
+            font-weight: 500;
+            color: #1e293b;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-badge.checked-in {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-badge.checked-out {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        
+        .expand-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #667eea;
+            transition: all 0.2s ease;
+        }
+        
+        .expand-btn:hover {
+            background: #e2e8f0;
+        }
+        
+        .client-details {
+            display: none;
+            background: #f8fafc;
+            padding: 16px 20px;
+        }
+        
+        .client-details.show {
+            display: block;
+        }
+        
+        .client-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+        }
+        
+        .client-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .client-item h4 {
+            font-size: 14px;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        
+        .client-item p {
+            font-size: 13px;
+            color: #64748b;
+            white-space: pre-wrap;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+        
+        .no-data svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success {
+            background: #10b981;
+        }
+        
+        .toast.error {
+            background: #ef4444;
+        }
+        
+        .duration {
+            font-weight: 500;
+            color: #667eea;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Attendance Admin Dashboard</h1>
+        <div class="header-actions">
+            <a href="index.html" class="back-link">← Back to Check-In</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card checked-in">
+                <h3>Currently Checked In</h3>
+                <div class="value" id="checkedInCount">0</div>
+            </div>
+            <div class="stat-card checked-out">
+                <h3>Checked Out Today</h3>
+                <div class="value" id="checkedOutCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Check-Ins Today</h3>
+                <div class="value" id="totalCheckIns">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Avg. Hours Today</h3>
+                <div class="value" id="avgHours">0h</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('attendance')">📋 Attendance</div>
+            <div class="tab" onclick="switchTab('eod')">📝 EOD Reports</div>
+            <div class="tab" onclick="switchTab('clients')">👥 Client Reports</div>
+        </div>
+        
+        <div class="filters" id="attendanceFilters">
+            <div class="filter-group">
+                <label for="filterDate">Date</label>
+                <input type="date" id="filterDate">
+            </div>
+            <div class="filter-group">
+                <label for="filterEmployee">Employee</label>
+                <select id="filterEmployee">
+                    <option value="">All Employees</option>
+                    <option value="JV">JV</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Jeff">Jeff</option>
+                    <option value="Josh">Josh</option>
+                    <option value="Louie">Louie</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterStatus">Status</label>
+                <select id="filterStatus">
+                    <option value="">All</option>
+                    <option value="checked_in">Checked In</option>
+                    <option value="checked_out">Checked Out</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <button class="btn btn-primary" onclick="applyFilters()">Apply</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+            </div>
+        </div>
+        
+        <div class="filters" id="eodFilters" style="display:none;">
+            <div class="filter-group">
+                <label for="eodFilterDate">Date</label>
+                <input type="date" id="eodFilterDate">
+            </div>
+            <div class="filter-group">
+                <label for="eodFilterEmployee">Employee</label>
+                <select id="eodFilterEmployee">
+                    <option value="">All Employees</option>
+                    <option value="JV">JV</option>
+                    <option value="Angelito">Angelito</option>
+                    <option value="Adrian">Adrian</option>
+                    <option value="Jeff">Jeff</option>
+                    <option value="Josh">Josh</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <button class="btn btn-primary" onclick="applyEODFilters()">Apply</button>
+                <button class="btn btn-secondary" onclick="clearEODFilters()">Clear</button>
+            </div>
+        </div>
+        
+        <div class="filters" id="clientFilters" style="display:none;">
+            <div class="filter-group">
+                <label for="clientFilterDate">Date</label>
+                <input type="date" id="clientFilterDate">
+            </div>
+            <div class="filter-group">
+                <label for="clientFilterEmployee">Employee</label>
+                <select id="clientFilterEmployee">
+                    <option value="">All Employees</option>
+                    <option value="Louie">Louie</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <button class="btn btn-primary" onclick="applyClientFilters()">Apply</button>
+                <button class="btn btn-secondary" onclick="clearClientFilters()">Clear</button>
+            </div>
+        </div>
+        
+        <!-- Attendance Table -->
+        <div class="table-container" id="attendanceTable">
+            <div class="table-header">
+                <h2>Attendance Records</h2>
+            </div>
+            <div class="table-wrapper">
+                <div id="attendanceContent">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading records...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- EOD Reports Table -->
+        <div class="table-container" id="eodTable" style="display:none;">
+            <div class="table-header">
+                <h2>EOD Reports</h2>
+            </div>
+            <div class="table-wrapper">
+                <div id="eodContent">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading reports...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Client Reports Table -->
+        <div class="table-container" id="clientTable" style="display:none;">
+            <div class="table-header">
+                <h2>Client Reports</h2>
+            </div>
+            <div class="table-wrapper">
+                <div id="clientContent">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading reports...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://owocuvkufkgsxovdkmqs.supabase.co';
+        const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93b2N1dmVrZmZrc3xvdmRrbXFzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MDAwMDAwMCwiZXhwIjoyMDU1NTc2MDAwfQ.placeholder';
+        
+        // Initialize Supabase client
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+        
+        let allAttendance = [];
+        let filteredAttendance = [];
+        let allEODReports = [];
+        let allClientReports = [];
+        let currentTab = 'attendance';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            setDefaultDate();
+            loadAllData();
+        });
+        
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('filterDate').value = today;
+            document.getElementById('eodFilterDate').value = today;
+            document.getElementById('clientFilterDate').value = today;
+        }
+        
+        async function loadAllData() {
+            await loadAttendance();
+            await loadEODReports();
+            await loadClientReports();
+            updateStats();
+        }
+        
+        async function loadAttendance() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('attendance_records')
+                    .select('*')
+                    .order('check_in_time', { ascending: false });
+                
+                if (error) throw error;
+                
+                allAttendance = data || [];
+                filteredAttendance = [...allAttendance];
+                
+                renderAttendanceTable();
+                
+            } catch (error) {
+                console.error('Error loading attendance:', error);
+                document.getElementById('attendanceContent').innerHTML = `
+                    <div class="no-data">
+                        <p>Error loading records. ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function loadEODReports() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('eod_reports')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allEODReports = data || [];
+                renderEODTable();
+                
+            } catch (error) {
+                console.error('Error loading EOD reports:', error);
+            }
+        }
+        
+        async function loadClientReports() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('client_reports')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allClientReports = data || [];
+                renderClientTable();
+                
+            } catch (error) {
+                console.error('Error loading client reports:', error);
+            }
+        }
+        
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            const todayRecords = allAttendance.filter(r => r.check_in_time.split('T')[0] === today);
+            const checkedIn = todayRecords.filter(r => r.status === 'checked_in');
+            const checkedOut = todayRecords.filter(r => r.status === 'checked_out');
+            
+            // Calculate average hours for completed sessions
+            let totalHours = 0;
+            let completedSessions = 0;
+            checkedOut.forEach(r => {
+                if (r.check_in_time && r.check_out_time) {
+                    const start = new Date(r.check_in_time);
+                    const end = new Date(r.check_out_time);
+                    const hours = (end - start) / (1000 * 60 * 60);
+                    if (hours > 0 && hours < 24) { // Sanity check
+                        totalHours += hours;
+                        completedSessions++;
+                    }
+                }
+            });
+            
+            const avgHours = completedSessions > 0 ? (totalHours / completedSessions).toFixed(1) : 0;
+            
+            document.getElementById('checkedInCount').textContent = checkedIn.length;
+            document.getElementById('checkedOutCount').textContent = checkedOut.length;
+            document.getElementById('totalCheckIns').textContent = todayRecords.length;
+            document.getElementById('avgHours').textContent = avgHours + 'h';
+        }
+        
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab styles
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide tables and filters
+            document.getElementById('attendanceTable').style.display = tab === 'attendance' ? 'block' : 'none';
+            document.getElementById('eodTable').style.display = tab === 'eod' ? 'block' : 'none';
+            document.getElementById('clientTable').style.display = tab === 'clients' ? 'block' : 'none';
+            
+            document.getElementById('attendanceFilters').style.display = tab === 'attendance' ? 'flex' : 'none';
+            document.getElementById('eodFilters').style.display = tab === 'eod' ? 'flex' : 'none';
+            document.getElementById('clientFilters').style.display = tab === 'clients' ? 'flex' : 'none';
+        }
+        
+        function applyFilters() {
+            const filterDate = document.getElementById('filterDate').value;
+            const filterEmployee = document.getElementById('filterEmployee').value;
+            const filterStatus = document.getElementById('filterStatus').value;
+            
+            filteredAttendance = allAttendance.filter(record => {
+                const recordDate = record.check_in_time.split('T')[0];
+                const matchesDate = !filterDate || recordDate === filterDate;
+                const matchesEmployee = !filterEmployee || record.employee_name === filterEmployee;
+                const matchesStatus = !filterStatus || record.status === filterStatus;
+                return matchesDate && matchesEmployee && matchesStatus;
+            });
+            
+            renderAttendanceTable();
+        }
+        
+        function clearFilters() {
+            document.getElementById('filterDate').value = '';
+            document.getElementById('filterEmployee').value = '';
+            document.getElementById('filterStatus').value = '';
+            filteredAttendance = [...allAttendance];
+            renderAttendanceTable();
+        }
+        
+        function applyEODFilters() {
+            const filterDate = document.getElementById('eodFilterDate').value;
+            const filterEmployee = document.getElementById('eodFilterEmployee').value;
+            
+            const filtered = allEODReports.filter(report => {
+                const reportDate = report.created_at.split('T')[0];
+                const matchesDate = !filterDate || reportDate === filterDate;
+                const matchesEmployee = !filterEmployee || report.employee_name === filterEmployee;
+                return matchesDate && matchesEmployee;
+            });
+            
+            renderEODTable(filtered);
+        }
+        
+        function clearEODFilters() {
+            document.getElementById('eodFilterDate').value = '';
+            document.getElementById('eodFilterEmployee').value = '';
+            renderEODTable();
+        }
+        
+        function applyClientFilters() {
+            const filterDate = document.getElementById('clientFilterDate').value;
+            const filterEmployee = document.getElementById('clientFilterEmployee').value;
+            
+            const filtered = allClientReports.filter(report => {
+                const reportDate = report.created_at.split('T')[0];
+                const matchesDate = !filterDate || reportDate === filterDate;
+                const matchesEmployee = !filterEmployee || report.employee_name === filterEmployee;
+                return matchesDate && matchesEmployee;
+            });
+            
+            renderClientTable(filtered);
+        }
+        
+        function clearClientFilters() {
+            document.getElementById('clientFilterDate').value = '';
+            document.getElementById('clientFilterEmployee').value = '';
+            renderClientTable();
+        }
+        
+        function renderAttendanceTable(reports = filteredAttendance) {
+            if (reports.length === 0) {
+                document.getElementById('attendanceContent').innerHTML = `
+                    <div class="no-data">
+                        <p>No attendance records found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Date</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            reports.forEach(record => {
+                const checkIn = new Date(record.check_in_time);
+                const date = checkIn.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                const checkInTime = checkIn.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                let checkOutTime = '-';
+                let duration = '-';
+                
+                if (record.check_out_time) {
+                    const checkOut = new Date(record.check_out_time);
+                    checkOutTime = checkOut.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    const diffMs = checkOut - checkIn;
+                    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    duration = `${hours}h ${mins}m`;
+                }
+                
+                html += `
+                    <tr>
+                        <td class="employee-name">${escapeHtml(record.employee_name)}</td>
+                        <td>${date}</td>
+                        <td>${checkInTime}</td>
+                        <td>${checkOutTime}</td>
+                        <td class="duration">${duration}</td>
+                        <td><span class="status-badge ${record.status}">${record.status === 'checked_in' ? 'Checked In' : 'Checked Out'}</span></td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('attendanceContent').innerHTML = html;
+        }
+        
+        function renderEODTable(reports = allEODReports) {
+            if (reports.length === 0) {
+                document.getElementById('eodContent').innerHTML = `
+                    <div class="no-data">
+                        <p>No EOD reports found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Employee</th>
+                            <th>Videos Done</th>
+                            <th>Revisions Done</th>
+                            <th>New Videos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            reports.forEach(report => {
+                const date = new Date(report.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                html += `
+                    <tr>
+                        <td>${date}</td>
+                        <td class="employee-name">${escapeHtml(report.employee_name)}</td>
+                        <td class="videos-cell">${escapeHtml(report.videos_done || '-')}</td>
+                        <td class="revisions-cell">${escapeHtml(report.revisions_done || '-')}</td>
+                        <td><span class="status-badge checked-in">${report.new_videos_count || 0}</span></td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('eodContent').innerHTML = html;
+        }
+        
+        function renderClientTable(reports = allClientReports) {
+            if (reports.length === 0) {
+                document.getElementById('clientContent').innerHTML = `
+                    <div class="no-data">
+                        <p>No client reports found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Group by attendance_id
+            const grouped = {};
+            reports.forEach(report => {
+                if (!grouped[report.attendance_id]) {
+                    grouped[report.attendance_id] = {
+                        employee_name: report.employee_name,
+                        created_at: report.created_at,
+                        clients: []
+                    };
+                }
+                grouped[report.attendance_id].clients.push(report);
+            });
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Employee</th>
+                            <th>Clients</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            Object.values(grouped).forEach(group => {
+                const date = new Date(group.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                const clientCount = group.clients.length;
+                
+                html += `
+                    <tr>
+                        <td>${date}</td>
+                        <td class="employee-name">${escapeHtml(group.employee_name)}</td>
+                        <td><span class="status-badge checked-in">${clientCount} client(s)</span></td>
+                        <td><button class="expand-btn" onclick="toggleClientDetails('${group.created_at}')">View Details</button></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" style="padding:0;">
+                            <div class="client-details" id="clientDetails_${group.created_at.replace(/[^a-zA-Z0-9]/g, '_')}">
+                                ${group.clients.map(c => `
+                                    <div class="client-item">
+                                        <h4>👤 ${escapeHtml(c.client_name)}</h4>
+                                        <p>${escapeHtml(c.report)}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('clientContent').innerHTML = html;
+        }
+        
+        function toggleClientDetails(id) {
+            const safeId = id.replace(/[^a-zA-Z0-9]/g, '_');
+            const element = document.getElementById(`clientDetails_${safeId}`);
+            element.classList.toggle('show');
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+
