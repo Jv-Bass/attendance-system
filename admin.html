@@ -544,12 +544,6 @@
                 <label for="filterEmployee">Employee</label>
                 <select id="filterEmployee">
                     <option value="">All Employees</option>
-                    <option value="JV">JV</option>
-                    <option value="Angelito">Angelito</option>
-                    <option value="Adrian">Adrian</option>
-                    <option value="Jeff">Jeff</option>
-                    <option value="Josh">Josh</option>
-                    <option value="Louie">Louie</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -575,11 +569,6 @@
                 <label for="eodFilterEmployee">Employee</label>
                 <select id="eodFilterEmployee">
                     <option value="">All Employees</option>
-                    <option value="JV">JV</option>
-                    <option value="Angelito">Angelito</option>
-                    <option value="Adrian">Adrian</option>
-                    <option value="Jeff">Jeff</option>
-                    <option value="Josh">Josh</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -706,10 +695,45 @@
         }
         
         async function loadAllData() {
+            await loadEmployees(); // Load employees first
             await loadAttendance();
             await loadEODReports();
             await loadClientReports();
             updateStats();
+        }
+        
+        async function loadEmployees() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('employees')
+                    .select('*')
+                    .order('name', { ascending: true });
+                
+                if (error) throw error;
+                
+                const employees = data || [];
+                
+                // Populate all employee dropdowns
+                const dropdowns = ['filterEmployee', 'eodFilterEmployee', 'clientFilterEmployee'];
+                
+                dropdowns.forEach(dropdownId => {
+                    const select = document.getElementById(dropdownId);
+                    if (select) {
+                        // Keep the first "All Employees" option
+                        select.innerHTML = '<option value="">All Employees</option>';
+                        
+                        employees.forEach(emp => {
+                            const option = document.createElement('option');
+                            option.value = emp.name;
+                            option.textContent = emp.name;
+                            select.appendChild(option);
+                        });
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading employees:', error);
+            }
         }
         
         async function loadAttendance() {
