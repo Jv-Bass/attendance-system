@@ -1,10 +1,6 @@
 -- ============================================
 -- Attendance System - Database Schema
 -- Supabase SQL Setup Script
-<<<<<<< HEAD
--- Project: https://uwnnpvepyyutrxsnhzku.supabase.co
-=======
->>>>>>> 92af6570895fc3ca083a663b024d5032cd0fa81b
 -- ============================================
 
 -- Enable UUID extension
