@@ -685,13 +685,7 @@
             employees.forEach(emp => {
                 const option = document.createElement('option');
                 option.value = emp.name;
-                if (emp.type === 'manager') {
-                    option.textContent = `${emp.name} (Manager)`;
-                } else if (emp.type === 'owner') {
-                    option.textContent = `${emp.name} (Owner)`;
-                } else {
-                    option.textContent = emp.name;
-                }
+                option.textContent = emp.name;
                 select.appendChild(option);
             });
         }
