@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Supabase Setup</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Setting up Supabase...</h1>
+    <pre id="output"></pre>
+    <script>
+        const output = document.getElementById('output');
+        function log(msg) {
+            output.textContent += msg + '\n';
+            console.log(msg);
+        }
+        
+        const SUPABASE_URL = 'https://uwnnpvepyyutrxsnhzku.supabase.co';
+        const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bm5wdmVweXl1dHJ4c25oemt1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMTE0OTg0MywiZXhwIjoyMDg2NzI1ODQzfQ.THXsMBNZ496G6Vj8GA7q5uEUpjE8WM994sA_K8VhLfQ';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SERVICE_KEY);
+        
+        async function setup() {
+            try {
+                // Create employees table
+                log('1. Creating employees table...');
+                const { error: empError } = await supabase.rpc('create_employees_table', {});
+                if (empError) {
+                    log('Note: Cannot create tables via RPC. Using direct insert.');
+                }
+                
+                // Insert employees
+                const employees = [
+                    { name: 'JV', type: 'owner', role: 'Business Owner' },
+                    { name: 'Louie', type: 'manager', role: 'Business Manager' },
+                    { name: 'Angelito', type: 'regular', role: 'Video Editor' },
+                    { name: 'Adrian', type: 'regular', role: 'Video Editor' },
+                    { name: 'Jeff', type: 'regular', role: 'Video Editor' },
+                    { name: 'Josh', type: 'regular', role: 'Video Editor' },
+                    { name: 'John', type: 'regular', role: 'Video Editor' }
+                ];
+                
+                log('2. Inserting employees...');
+                for (const emp of employees) {
+                    const { data, error } = await supabase.from('employees').insert(emp);
+                    if (error) {
+                        log('Error inserting ' + emp.name + ': ' + error.message);
+                    } else {
+                        log('OK: ' + emp.name);
+                    }
+                }
+                
+                // Verify
+                log('3. Verifying...');
+                const { data: allEmps } = await supabase.from('employees').select('*');
+                log('Total employees: ' + (allEmps ? allEmps.length : 0));
+                
+                log('\nSetup complete!');
+            } catch (e) {
+                log('Error: ' + e.message);
+            }
+        }
+        
+        setup();
+    </script>
+</body>
+</html>

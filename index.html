@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System - Check In/Out</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 32px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .current-time {
+            font-size: 42px;
+            font-weight: 700;
+            margin-top: 16px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .content {
+            padding: 32px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .status-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .status-card h3 {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-item .name {
+            font-weight: 500;
+            color: #1e293b;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-badge.checked-in {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-badge.checked-out {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-checkin {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-checkin:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-checkout {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-checkout:hover:not(:disabled) {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        .message {
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .message.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        .message.info {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+        
+        .links {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .links a {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 0 10px;
+        }
+        
+        .links a:hover {
+            color: #667eea;
+        }
+        
+        .links a.register-link {
+            color: #667eea;
+            font-weight: 500;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlide 0.3s ease;
+        }
+        
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .form-group-modal {
+            margin-bottom: 20px;
+        }
+        
+        .form-group-modal label {
+            display: block;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group-modal input, 
+        .form-group-modal select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-group-modal input:focus,
+        .form-group-modal select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .submit-modal-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .submit-modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .employee-type-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .employee-type-option {
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .employee-type-option:hover {
+            border-color: #667eea;
+        }
+        
+        .employee-type-option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .employee-type-option input {
+            display: none;
+        }
+        
+        .employee-type-option .icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .employee-type-option .label {
+            font-weight: 500;
+            color: #1e293b;
+        }
+        
+        .employee-type-option .desc {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        
+        .success-icon {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .success-icon .check {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        .success-icon h3 {
+            color: #10b981;
+            margin-bottom: 8px;
+        }
+        
+        .success-icon p {
+            color: #64748b;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Attendance System</h1>
+            <p>Check In / Check Out</p>
+            <div class="current-time" id="currentTime">00:00:00</div>
+        </div>
+        
+        <div class="content">
+            <div id="message" class="message"></div>
+            
+            <div class="form-group">
+                <label for="employeeName">Select Your Name</label>
+                <select id="employeeName">
+                    <option value="">Choose your name...</option>
+                    <!-- Dynamically populated -->
+                </select>
+            </div>
+            
+            <div class="status-card">
+                <h3>👥 Current Status</h3>
+                <div id="statusList">
+                    <!-- Status items will be loaded here -->
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-checkin" id="checkinBtn" onclick="checkIn()">✅ Check In</button>
+                <button class="btn btn-checkout" id="checkoutBtn" onclick="checkOut()" disabled>🚪 Check Out</button>
+            </div>
+            
+            <div class="links">
+                <a href="admin.html">📊 Admin Dashboard</a>
+                <a href="#" class="register-link" onclick="openRegisterModal(); return false;">📝 Register Here</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- EOD Report Modal (for regular employees) -->
+    <div class="modal-overlay" id="eodModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>📝 End of Day Report</h2>
+                <button class="modal-close" onclick="closeEODModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="eodForm">
+                    <div class="form-group-modal">
+                        <label for="eodVideosDone">What videos did you do today?</label>
+                        <textarea id="eodVideosDone" required placeholder="List the videos you worked on..."></textarea>
+                    </div>
+                    
+                    <div class="form-group-modal">
+                        <label for="eodRevisionsDone">What revisions did you do today?</label>
+                        <textarea id="eodRevisionsDone" required placeholder="List the revisions you completed..."></textarea>
+                    </div>
+                    
+                    <div class="form-group-modal">
+                        <label for="eodNewVideosCount">Number of new videos edited</label>
+                        <input type="number" id="eodNewVideosCount" required min="0" placeholder="0">
+                    </div>
+                    
+                    <button type="submit" class="submit-modal-btn">Submit Report & Check Out</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Client Report Modal (for Louie) -->
+    <div class="modal-overlay" id="clientModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>📊 Client Reports</h2>
+                <button class="modal-close" onclick="closeClientModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="clientForm">
+                    <div id="clientBoxes">
+                        <!-- Client boxes will be added here -->
+                    </div>
+                    
+                    <button type="button" class="submit-modal-btn" style="background: #f1f5f9; color: #475569; margin-bottom: 12px;" onclick="addClientBox()">+ Add Another Client</button>
+                    
+                    <button type="submit" class="submit-modal-btn">Submit Reports & Check Out</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Registration Modal -->
+    <div class="modal-overlay" id="registerModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>📝 Register New Employee</h2>
+                <button class="modal-close" onclick="closeRegisterModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm">
+                    <div class="form-group-modal">
+                        <label for="regName">Full Name *</label>
+                        <input type="text" id="regName" required placeholder="Enter your full name">
+                    </div>
+                    
+                    <div class="form-group-modal">
+                        <label>Employee Type *</label>
+                        <div class="employee-type-group">
+                            <label class="employee-type-option" id="typeRegularOption">
+                                <input type="radio" name="regType" value="regular" checked>
+                                <div class="icon">👨‍💻</div>
+                                <div class="label">Regular</div>
+                                <div class="desc">EOD Reports</div>
+                            </label>
+                            <label class="employee-type-option" id="typeManagerOption">
+                                <input type="radio" name="regType" value="manager">
+                                <div class="icon">👔</div>
+                                <div class="label">Manager</div>
+                                <div class="desc">Client Reports</div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group-modal" id="managerFields" style="display: none;">
+                        <label for="regRole">Role/Title *</label>
+                        <input type="text" id="regRole" placeholder="e.g., Business Manager">
+                        <label for="managerPassword" style="margin-top: 12px;">Manager Password *</label>
+                        <input type="password" id="managerPassword" placeholder="Enter manager password">
+                        <p style="font-size: 12px; color: #64748b; margin-top: 4px;">Contact JV for the manager password</p>
+                    </div>
+                    
+                    <button type="submit" class="submit-modal-btn" id="registerBtn">Register</button>
+                </form>
+                
+                <!-- Success Message (hidden by default) -->
+                <div id="registerSuccess" style="display: none;">
+                    <div class="success-icon">
+                        <div class="check">✅</div>
+                        <h3>Registration Successful!</h3>
+                        <p>You can now select your name and check in.</p>
+                        <button class="submit-modal-btn" style="margin-top: 20px;" onclick="closeRegisterModalAndRefresh()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://uwnnpvepyyutrxsnhzku.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bm5wdmVweXl1dHJ4c25oemt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDk4NDMsImV4cCI6MjA4NjcyNTg0M30.qbf1dnPQ8srUc2EcwNHNz3HFz3v5_A7gKUS1ZWKV7vM';
+        
+        // Initialize Supabase client
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let currentAttendanceId = null;
+        let clientCount = 0;
+        let employees = [];
+        
+        // Update time every second
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+        
+        // Load employees and status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEmployees();
+            loadStatus();
+            setupEmployeeTypeToggle();
+        });
+        
+        function setupEmployeeTypeToggle() {
+            const regularOption = document.getElementById('typeRegularOption');
+            const managerOption = document.getElementById('typeManagerOption');
+            const managerFields = document.getElementById('managerFields');
+            
+            regularOption.addEventListener('click', function() {
+                document.querySelector('input[name="regType"][value="regular"]').checked = true;
+                regularOption.classList.add('selected');
+                managerOption.classList.remove('selected');
+                managerFields.style.display = 'none';
+                document.getElementById('regRole').required = false;
+                document.getElementById('managerPassword').required = false;
+            });
+            
+            managerOption.addEventListener('click', function() {
+                document.querySelector('input[name="regType"][value="manager"]').checked = true;
+                managerOption.classList.add('selected');
+                regularOption.classList.remove('selected');
+                managerFields.style.display = 'block';
+                document.getElementById('regRole').required = true;
+                document.getElementById('managerPassword').required = true;
+            });
+            
+            // Set initial state
+            regularOption.classList.add('selected');
+        }
+        
+        async function loadEmployees() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('employees')
+                    .select('*')
+                    .order('name', { ascending: true });
+                
+                if (error) throw error;
+                
+                employees = data || [];
+                populateEmployeeDropdown();
+                
+            } catch (error) {
+                console.error('Error loading employees:', error);
+                // Fallback to hardcoded list
+                employees = [
+                    { name: 'JV', type: 'owner' },
+                    { name: 'Louie', type: 'manager' },
+                    { name: 'Angelito', type: 'regular' },
+                    { name: 'Adrian', type: 'regular' },
+                    { name: 'Jeff', type: 'regular' },
+                    { name: 'Josh', type: 'regular' },
+                    { name: 'John', type: 'regular' }
+                ];
+                populateEmployeeDropdown();
+            }
+        }
+        
+        function populateEmployeeDropdown() {
+            const select = document.getElementById('employeeName');
+            select.innerHTML = '<option value="">Choose your name...</option>';
+            
+            employees.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp.name;
+                if (emp.type === 'manager') {
+                    option.textContent = `${emp.name} (Manager)`;
+                } else if (emp.type === 'owner') {
+                    option.textContent = `${emp.name} (Owner)`;
+                } else {
+                    option.textContent = emp.name;
+                }
+                select.appendChild(option);
+            });
+        }
+        
+        async function loadStatus() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('attendance_records')
+                    .select('*')
+                    .is('check_out_time', null);
+                
+                if (error) throw error;
+                
+                const statusList = document.getElementById('statusList');
+                
+                // Get all employees
+                const employeeNames = employees.map(e => e.name);
+                
+                // Build status list
+                let html = '';
+                const checkedInEmployees = data.map(d => d.employee_name);
+                
+                // Show only regular and manager employees (hide owner)
+                employeeNames.filter(emp => {
+                    const empData = employees.find(e => e.name === emp);
+                    return empData && empData.type !== 'owner';
+                }).forEach(emp => {
+                    const isCheckedIn = checkedInEmployees.includes(emp);
+                    html += `
+                        <div class="status-item">
+                            <span class="name">${emp}</span>
+                            <span class="status-badge ${isCheckedIn ? 'checked-in' : 'checked-out'}">
+                                ${isCheckedIn ? '✅ Checked In' : '❌ Checked Out'}
+                            </span>
+                        </div>
+                    `;
+                });
+                
+                statusList.innerHTML = html || '<p style="color: #94a3b8; text-align: center;">No employees checked in yet</p>';
+                
+                // Update button states
+                updateButtonStates(data);
+                
+            } catch (error) {
+                console.error('Error loading status:', error);
+            }
+        }
+        
+        function updateButtonStates(checkedInRecords) {
+            const employeeSelect = document.getElementById('employeeName');
+            const checkinBtn = document.getElementById('checkinBtn');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            const selectedEmployee = employeeSelect.value;
+            
+            if (!selectedEmployee) {
+                checkinBtn.disabled = true;
+                checkoutBtn.disabled = true;
+                currentAttendanceId = null;
+                return;
+            }
+            
+            const record = checkedInRecords.find(r => r.employee_name === selectedEmployee);
+            
+            if (record) {
+                // Already checked in
+                checkinBtn.disabled = true;
+                checkoutBtn.disabled = false;
+                currentAttendanceId = record.id;
+            } else {
+                // Not checked in
+                checkinBtn.disabled = false;
+                checkoutBtn.disabled = true;
+                currentAttendanceId = null;
+            }
+        }
+        
+        document.getElementById('employeeName').addEventListener('change', function() {
+            loadStatus();
+        });
+        
+        async function checkIn() {
+            const employeeName = document.getElementById('employeeName').value;
+            
+            if (!employeeName) {
+                showMessage('error', 'Please select your name first!');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('attendance_records')
+                    .insert([{
+                        employee_name: employeeName,
+                        check_in_time: new Date().toISOString(),
+                        status: 'checked_in'
+                    }])
+                    .select()
+                    .single();
+                
+                if (error) throw error;
+                
+                showMessage('success', `✅ Welcome, ${employeeName}! Have a productive day!`);
+                loadStatus();
+                
+            } catch (error) {
+                console.error('Check-in error:', error);
+                showMessage('error', 'Error during check-in: ' + error.message);
+            }
+        }
+        
+        async function checkOut() {
+            const employeeName = document.getElementById('employeeName').value;
+            
+            if (!employeeName) {
+                showMessage('error', 'Please select your name first!');
+                return;
+            }
+            
+            // Check if employee is a manager or owner
+            const employee = employees.find(e => e.name === employeeName);
+            
+            if (employee && (employee.type === 'manager' || employee.type === 'owner')) {
+                // Open client report modal for managers and owners
+                openClientModal();
+            } else {
+                // Open EOD report modal for regular employees
+                openEODModal();
+            }
+        }
+        
+        function openEODModal() {
+            document.getElementById('eodModal').classList.add('show');
+            document.getElementById('eodVideosDone').value = '';
+            document.getElementById('eodRevisionsDone').value = '';
+            document.getElementById('eodNewVideosCount').value = '';
+        }
+        
+        function closeEODModal() {
+            document.getElementById('eodModal').classList.remove('show');
+        }
+        
+        function openClientModal() {
+            document.getElementById('clientModal').classList.add('show');
+            // Add first client box
+            document.getElementById('clientBoxes').innerHTML = '';
+            clientCount = 0;
+            addClientBox();
+        }
+        
+        function closeClientModal() {
+            document.getElementById('clientModal').classList.remove('show');
+        }
+        
+        function openRegisterModal() {
+            document.getElementById('registerModal').classList.add('show');
+            document.getElementById('registerForm').reset();
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('registerSuccess').style.display = 'none';
+            document.getElementById('typeRegularOption').click();
+        }
+        
+        function closeRegisterModal() {
+            document.getElementById('registerModal').classList.remove('show');
+        }
+        
+        function closeRegisterModalAndRefresh() {
+            closeRegisterModal();
+            loadEmployees();
+            loadStatus();
+        }
+        
+        function addClientBox() {
+            clientCount++;
+            const clientList = [
+                'Client A', 'Client B', 'Client C', 'Client D', 'Client E',
+                'Client F', 'Client G', 'Client H'
+            ];
+            
+            let options = '';
+            clientList.forEach((client, index) => {
+                options += `<option value="${client}">${client}</option>`;
+            });
+            options += `<option value="new">+ Add New Client</option>`;
+            
+            const html = `
+                <div class="form-group-modal" id="clientBox${clientCount}" style="background: #f8fafc; padding: 16px; border-radius: 10px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <strong style="color: #1e293b;">Client #${clientCount}</strong>
+                        ${clientCount > 1 ? `<button type="button" style="background: #fef2f2; color: #ef4444; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;" onclick="removeClientBox(${clientCount})">Remove</button>` : ''}
+                    </div>
+                    <div class="client-row" style="margin-bottom: 12px;">
+                        <select class="client-select" onchange="handleClientSelect(this)" style="width: 100%;">
+                            <option value="">Select client...</option>
+                            ${options}
+                        </select>
+                    </div>
+                    <input type="text" class="client-name-input" placeholder="Client name" style="width: 100%; padding: 10px 14px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; display: none;">
+                    <textarea class="client-report" placeholder="Report for this client..." style="width: 100%; padding: 10px 14px; border: 2px solid #e2e8f0; border-radius: 8px; min-height: 80px; resize: vertical;"></textarea>
+                </div>
+            `;
+            
+            document.getElementById('clientBoxes').insertAdjacentHTML('beforeend', html);
+        }
+        
+        function removeClientBox(id) {
+            document.getElementById(`clientBox${id}`).remove();
+        }
+        
+        function handleClientSelect(select) {
+            const nameInput = select.parentElement.parentElement.querySelector('.client-name-input');
+            if (select.value === 'new') {
+                nameInput.style.display = 'block';
+                nameInput.required = true;
+                nameInput.placeholder = 'Enter client name';
+            } else {
+                nameInput.style.display = 'none';
+                nameInput.required = false;
+            }
+        }
+        
+        // Registration form submission
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('regName').value.trim();
+            const type = document.querySelector('input[name="regType"]:checked').value;
+            const role = document.getElementById('regRole').value.trim();
+            const managerPassword = document.getElementById('managerPassword').value;
+            
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<span class="loading"></span>Registering...';
+            
+            try {
+                // Check if employee already exists
+                const { data: existing } = await supabaseClient
+                    .from('employees')
+                    .select('*')
+                    .eq('name', name)
+                    .single();
+                
+                if (existing) {
+                    throw new Error('An employee with this name already exists.');
+                }
+                
+                // Validate manager password
+                const MANAGER_PASSWORD = 'louie2024'; // Change this password
+                if (type === 'manager' && managerPassword !== MANAGER_PASSWORD) {
+                    throw new Error('Incorrect manager password. Contact JV for access.');
+                }
+                
+                // Insert new employee
+                const { error } = await supabaseClient
+                    .from('employees')
+                    .insert([{
+                        name: name,
+                        type: type,
+                        role: role || (type === 'manager' ? 'Manager' : 'Employee'),
+                        created_at: new Date().toISOString()
+                    }]);
+                
+                if (error) throw error;
+                
+                // Show success message
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('registerSuccess').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                showMessage('error', 'Registration failed: ' + error.message);
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+            }
+        });
+        
+        // EOD Form submission
+        document.getElementById('eodForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const employeeName = document.getElementById('employeeName').value;
+            
+            try {
+                // Update attendance record
+                const { error: updateError } = await supabaseClient
+                    .from('attendance_records')
+                    .update({
+                        check_out_time: new Date().toISOString(),
+                        status: 'checked_out'
+                    })
+                    .eq('id', currentAttendanceId);
+                
+                if (updateError) throw updateError;
+                
+                // Save EOD report
+                const { error: reportError } = await supabaseClient
+                    .from('eod_reports')
+                    .insert([{
+                        employee_name: employeeName,
+                        videos_done: document.getElementById('eodVideosDone').value.trim(),
+                        revisions_done: document.getElementById('eodRevisionsDone').value.trim(),
+                        new_videos_count: parseInt(document.getElementById('eodNewVideosCount').value) || 0,
+                        created_at: new Date().toISOString()
+                    }]);
+                
+                if (reportError) throw reportError;
+                
+                closeEODModal();
+                showMessage('success', `✅ Goodbye, ${employeeName}! Report submitted successfully!`);
+                loadStatus();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('error', 'Error submitting report: ' + error.message);
+            }
+        });
+        
+        // Client Form submission
+        document.getElementById('clientForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const employeeName = document.getElementById('employeeName').value;
+            const clientBoxes = document.querySelectorAll('.form-group-modal[id^="clientBox"]');
+            const clientReports = [];
+            
+            // Collect client reports
+            clientBoxes.forEach(box => {
+                const clientSelect = box.querySelector('.client-select');
+                const nameInput = box.querySelector('.client-name-input');
+                const report = box.querySelector('.client-report');
+                
+                let clientName = clientSelect.value;
+                if (clientName === 'new') {
+                    clientName = nameInput.value.trim();
+                }
+                
+                if (clientName && report.value.trim()) {
+                    clientReports.push({
+                        client_name: clientName,
+                        report: report.value.trim()
+                    });
+                }
+            });
+            
+            if (clientReports.length === 0) {
+                alert('Please add at least one client with a report.');
+                return;
+            }
+            
+            try {
+                // Update attendance record
+                const { error: updateError } = await supabaseClient
+                    .from('attendance_records')
+                    .update({
+                        check_out_time: new Date().toISOString(),
+                        status: 'checked_out'
+                    })
+                    .eq('id', currentAttendanceId);
+                
+                if (updateError) throw updateError;
+                
+                // Save client reports
+                const reportsToInsert = clientReports.map(report => ({
+                    employee_name: employeeName,
+                    attendance_id: currentAttendanceId,
+                    client_name: report.client_name,
+                    report: report.report,
+                    created_at: new Date().toISOString()
+                }));
+                
+                const { error: clientError } = await supabaseClient
+                    .from('client_reports')
+                    .insert(reportsToInsert);
+                
+                if (clientError) throw clientError;
+                
+                closeClientModal();
+                showMessage('success', `✅ Goodbye, ${employeeName}! ${clientReports.length} client report(s) submitted!`);
+                loadStatus();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('error', 'Error submitting reports: ' + error.message);
+            }
+        });
+        
+        function showMessage(type, text) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = 'message ' + type;
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
