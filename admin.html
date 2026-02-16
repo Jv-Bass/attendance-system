@@ -679,13 +679,13 @@
             }
         }
         
-        // Supabase configuration
+        // Supabase configuration (use anon key for client-side access)
         const SUPABASE_URL = 'https://uwnnpvepyyutrxsnhzku.supabase.co';
-        const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bm5wdmVweXl1dHJ4c25oemt1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMTE0OTg0MywiZXhwIjoyMDg2NzI1ODQzfQ.THXsMBNZ496G6Vj8GA7q5uEUpjE8WM994sA_K8VhLfQ';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bm5wdmVweXl1dHJ4c25oemt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDk4NDMsImV4cCI6MjA4NjcyNTg0M30.qbf1dnPQ8srUc2EcwNHNz3HFz3v5_A7gKUS1ZWKV7vM';
         
         // Initialize Supabase client
         const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         let allAttendance = [];
         let filteredAttendance = [];
