@@ -13,7 +13,6 @@
             --hcm-bg: #0f172a;
             --hcm-panel: #1e293b;
             --hcm-border: #334155;
-            --hcm-glow: 0 0 20px rgba(37, 99, 235, 0.4);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -23,150 +22,625 @@
             color: #e2e8f0;
             overflow-x: hidden;
         }
-        @keyframes bootSequence {
-            0% { opacity: 0; transform: scale(0.9); }
-            20% { opacity: 1; transform: scale(1); }
-            80% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(1.1); }
-        }
-        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes bootLoad { 0% { width: 0%; } 100% { width: 100%; } }
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.8) translateY(20px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
+        
+        /* Boot Screen */
         #bootScreen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: var(--hcm-bg);
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
         }
-        .boot-logo {
-            width: 120px; height: 120px;
-            display: flex; justify-content: center; align-items: center;
-            animation: bootSequence 2.5s ease forwards;
+        
+        .boot-logo-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .boot-logo img { width: 100%; height: 100%; object-fit: contain; }
-        .boot-text {
-            margin-top: 24px; font-size: 18px; font-weight: 600;
+        
+        .boot-logo-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top-color: var(--hcm-primary);
+            border-radius: 50%;
+            animation: rotate 1s linear infinite;
+        }
+        
+        .boot-logo-ring:nth-child(2) {
+            width: 80%;
+            height: 80%;
+            border-top-color: var(--hcm-secondary);
+            animation-direction: reverse;
+            animation-duration: 1.5s;
+        }
+        
+        .boot-logo-text {
+            font-size: 28px;
+            font-weight: 800;
             color: white;
             letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
         }
-        .boot-bar { width: 200px; height: 4px; background: var(--hcm-border); border-radius: 2px; margin-top: 20px; overflow: hidden; }
-        .boot-bar-fill { height: 100%; background: var(--hcm-primary); width: 0%; animation: bootLoad 2s ease forwards 0.5s; }
-        #appContainer { display: none; min-height: 100vh; position: relative; }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .boot-loading {
+            margin-top: 30px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .boot-loading span {
+            width: 10px;
+            height: 10px;
+            background: var(--hcm-primary);
+            border-radius: 50%;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+        
+        .boot-loading span:nth-child(2) { animation-delay: 0.2s; }
+        .boot-loading span:nth-child(3) { animation-delay: 0.4s; }
+        
+        /* Main App */
+        #appContainer {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+        }
+        
         .header-bar {
             background: linear-gradient(135deg, var(--hcm-panel), var(--hcm-bg));
             border-bottom: 1px solid var(--hcm-border);
             padding: 16px 24px;
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .logo { display: flex; align-items: center; gap: 12px; }
-        .logo svg { width: 32px; height: 32px; fill: var(--hcm-primary); }
-        .logo-text { font-size: 18px; font-weight: 700; color: white; }
-        .logo-text span { color: var(--hcm-secondary); }
-        .user-section { display: flex; align-items: center; gap: 12px; }
-        .user-avatar { width: 36px; height: 36px; background: var(--hcm-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; }
-        .user-info { text-align: right; }
-        .user-name { font-size: 14px; color: white; font-weight: 500; }
-        .user-role { font-size: 11px; color: var(--hcm-secondary); text-transform: uppercase; }
-        .logout-btn { background: transparent; border: 1px solid var(--hcm-border); color: #94a3b8; padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: all 0.3s ease; }
-        .logout-btn:hover { border-color: var(--hcm-primary); color: var(--hcm-primary); }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            color: white;
+        }
+        
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .logo-text span {
+            color: var(--hcm-secondary);
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--hcm-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .user-info {
+            text-align: right;
+        }
+        
+        .user-name {
+            font-size: 14px;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .user-role {
+            font-size: 11px;
+            color: var(--hcm-secondary);
+            text-transform: uppercase;
+        }
+        
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--hcm-border);
+            color: #94a3b8;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            border-color: var(--hcm-primary);
+            color: var(--hcm-primary);
+        }
+        
         .main-header {
             background: linear-gradient(135deg, var(--hcm-panel) 0%, var(--hcm-bg) 100%);
-            padding: 32px 24px; text-align: center;
+            padding: 32px 24px;
+            text-align: center;
             border-bottom: 1px solid var(--hcm-border);
         }
-        .main-header h1 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 4px; }
-        .main-header p { color: #94a3b8; font-size: 14px; }
-        .time-display { margin-top: 16px; font-size: 48px; font-family: 'Courier New', monospace; color: var(--hcm-primary); font-weight: 700; letter-spacing: 2px; }
-        .date-display { font-size: 14px; color: #94a3b8; margin-top: 4px; }
-        .main-content { max-width: 500px; margin: 0 auto; padding: 24px; }
-        .card {
-            background: var(--hcm-panel); border: 1px solid var(--hcm-border); border-radius: 16px; padding: 24px; margin-bottom: 20px; animation: slideUp 0.5s ease forwards; position: relative; overflow: hidden;
+        
+        .main-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
         }
-        .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--hcm-primary), var(--hcm-secondary)); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { font-size: 16px; font-weight: 600; color: white; }
-        .card-icon { width: 44px; height: 44px; background: rgba(37, 99, 235, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-        .card-icon svg { width: 22px; height: 22px; fill: var(--hcm-primary); }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 500; }
-        .form-input, .form-select { width: 100%; padding: 14px 16px; background: var(--hcm-bg); border: 1px solid var(--hcm-border); border-radius: 10px; color: white; font-size: 15px; transition: all 0.3s ease; }
-        .form-input:focus, .form-select:focus { outline: none; border-color: var(--hcm-primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232563eb' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; }
-        .form-select option { background: var(--hcm-bg); color: white; }
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-primary { background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-primary-dim)); color: white; }
-        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
-        .btn-secondary { background: transparent; border: 2px solid var(--hcm-border); color: #94a3b8; }
-        .btn-secondary:hover:not(:disabled) { border-color: var(--hcm-secondary); color: var(--hcm-secondary); }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .status-list { max-height: 300px; overflow-y: auto; }
-        .status-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--hcm-border); }
-        .status-item:last-child { border-bottom: none; }
-        .status-name { font-size: 14px; color: white; }
-        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-        .status-badge.active { background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; color: #22c55e; }
-        .message { padding: 14px; border-radius: 10px; margin-bottom: 20px; display: none; font-size: 14px; font-weight: 500; animation: slideUp 0.3s ease; }
-        .message.show { display: block; }
-        .message.success { background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; color: #22c55e; }
-        .message.error { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; }
-        .message.info { background: rgba(37, 99, 235, 0.1); border: 1px solid var(--hcm-primary); color: var(--hcm-primary); }
-        .links { text-align: center; padding-top: 20px; border-top: 1px solid var(--hcm-border); }
-        .links a { color: #94a3b8; text-decoration: none; font-size: 13px; margin: 0 10px; transition: color 0.3s ease; }
-        .links a:hover { color: var(--hcm-primary); }
-        .links a.register-link { color: var(--hcm-primary); font-weight: 500; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-        .modal-overlay.show { display: flex; }
-        .modal { background: var(--hcm-panel); border: 1px solid var(--hcm-border); border-radius: 20px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; animation: zoomIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
-        .modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--hcm-primary), var(--hcm-secondary)); }
-        .modal-header { padding: 24px 24px 16px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h2 { font-size: 18px; font-weight: 600; color: white; }
-        .modal-close { background: transparent; border: none; color: #94a3b8; font-size: 28px; cursor: pointer; transition: color 0.3s ease; line-height: 1; }
-        .modal-close:hover { color: white; }
-        .modal-body { padding: 0 24px 24px; }
-        .form-group-modal { margin-bottom: 20px; }
-        .submit-modal-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-primary-dim)); border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 12px; }
-        .submit-modal-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
-        textarea.form-input { min-height: 100px; resize: vertical; }
-        .employee-type-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .employee-type-option { background: var(--hcm-bg); border: 2px solid var(--hcm-border); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.3s ease; text-align: center; }
-        .employee-type-option:hover { border-color: var(--hcm-primary-dim); }
-        .employee-type-option.selected { border-color: var(--hcm-primary); background: rgba(37, 99, 235, 0.05); }
-        .employee-type-option input { display: none; }
-        .employee-type-option .icon { font-size: 28px; margin-bottom: 8px; }
-        .employee-type-option .label { font-size: 14px; font-weight: 600; color: white; }
-        .employee-type-option .desc { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-        .success-icon { text-align: center; padding: 40px 20px; }
-        .success-icon .icon { font-size: 64px; margin-bottom: 20px; }
-        .success-icon h3 { font-size: 20px; font-weight: 600; color: white; margin-bottom: 8px; }
-        .success-icon p { color: #94a3b8; }
-        .loading { display: inline-block; width: 20px; height: 20px; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: rotate 0.8s linear infinite; margin-right: 8px; }
-        .user-greeting { display: flex; align-items: center; gap: 10px; }
-        .welcome-badge { background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-secondary)); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; color: white; margin-bottom: 4px; }
-        @media (max-width: 500px) { .time-display { font-size: 36px; } }
+        
+        .main-header p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        .time-display {
+            margin-top: 16px;
+            font-size: 48px;
+            font-family: 'Courier New', monospace;
+            color: var(--hcm-primary);
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+        
+        .date-display {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        
+        .main-content {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .card {
+            background: var(--hcm-panel);
+            border: 1px solid var(--hcm-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            animation: zoomIn 0.4s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--hcm-primary), var(--hcm-secondary));
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--hcm-primary);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--hcm-bg);
+            border: 1px solid var(--hcm-border);
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--hcm-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-primary-dim));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--hcm-border);
+            color: #94a3b8;
+        }
+        
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .status-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--hcm-border);
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-name {
+            font-size: 14px;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .status-badge.active {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+        
+        .message {
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .message.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid #22c55e;
+            color: #22c55e;
+        }
+        
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        
+        .message.info {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid var(--hcm-primary);
+            color: var(--hcm-primary);
+        }
+        
+        .links {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--hcm-border);
+        }
+        
+        .links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+        
+        .links a:hover {
+            color: var(--hcm-primary);
+        }
+        
+        .links a.register-link {
+            color: var(--hcm-primary);
+            font-weight: 500;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--hcm-panel);
+            border: 1px solid var(--hcm-border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: zoomIn 0.3s ease;
+            position: relative;
+        }
+        
+        .modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--hcm-primary), var(--hcm-secondary));
+        }
+        
+        .modal-header {
+            padding: 24px 24px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            line-height: 1;
+        }
+        
+        .modal-close:hover {
+            color: white;
+        }
+        
+        .modal-body {
+            padding: 0 24px 24px;
+        }
+        
+        .form-group-modal {
+            margin-bottom: 20px;
+        }
+        
+        .submit-modal-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-primary-dim));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+        
+        .submit-modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        textarea.form-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .employee-type-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .employee-type-option {
+            background: var(--hcm-bg);
+            border: 2px solid var(--hcm-border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .employee-type-option:hover {
+            border-color: var(--hcm-primary-dim);
+        }
+        
+        .employee-type-option.selected {
+            border-color: var(--hcm-primary);
+            background: rgba(37, 99, 235, 0.05);
+        }
+        
+        .employee-type-option input {
+            display: none;
+        }
+        
+        .employee-type-option .icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .employee-type-option .label {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .employee-type-option .desc {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        
+        .welcome-badge {
+            background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-secondary));
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+        
+        .user-greeting {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .loading-dots {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: rotate 0.8s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 500px) {
+            .time-display { font-size: 36px; }
+        }
     </style>
 </head>
 <body>
+    <!-- Boot Screen -->
     <div id="bootScreen">
-        <div class="boot-logo">
-            <img src="logo.png" alt="HCM Logo">
+        <div class="boot-logo-container">
+            <div class="boot-logo-ring"></div>
+            <div class="boot-logo-ring"></div>
+            <div class="boot-logo-text">HCM</div>
         </div>
-        <div class="boot-text">HIGH CON MARKETING</div>
-        <div class="boot-bar"><div class="boot-bar-fill"></div></div>
+        <div class="boot-loading">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </div>
 
+    <!-- Main App -->
     <div id="appContainer">
         <div class="header-bar">
             <div class="logo">
-                <img src="logo.png" alt="HCM Logo" style="height: 36px; width: auto;">
+                <div class="logo-icon">HCM</div>
                 <div class="logo-text">HIGH <span>CON</span></div>
             </div>
             <div class="user-section" id="userSection" style="display: none;">
@@ -191,7 +665,7 @@
                 <div class="card-header">
                     <div class="card-title">Welcome Back</div>
                     <div class="card-icon">
-                        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
                     </div>
                 </div>
                 <div id="loginMessage" class="message"></div>
@@ -204,9 +678,7 @@
                         <label class="form-label">Password</label>
                         <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary" id="loginBtn">
-                        <span id="loginBtnText">Sign In</span>
-                    </button>
+                    <button type="submit" class="btn btn-primary" id="loginBtn"><span id="loginBtnText">Sign In</span></button>
                 </form>
                 <div class="links">
                     <a href="#" onclick="showRegisterModal(); return false;" class="register-link">New Team Member? Register Here</a>
@@ -219,14 +691,14 @@
                 <div class="card-header">
                     <div class="card-title">Quick Actions</div>
                     <div class="card-icon">
-                        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2z"/></svg>
                     </div>
                 </div>
                 <div id="attendanceMessage" class="message"></div>
-                <div id="loggedInUserDisplay" style="margin-bottom: 20px; padding: 16px; background: var(--hcm-bg); border-radius: 12px; display: flex; align-items: center; gap: 12px;">
+                <div class="user-greeting" style="margin-bottom: 20px;">
                     <div class="user-avatar" id="attendanceAvatar" style="width: 48px; height: 48px; font-size: 18px;">?</div>
                     <div>
-                        <div class="welcome-badge" id="attendanceRole">EMPLOYEE</div>
+                        <span class="welcome-badge" id="attendanceRole">EMPLOYEE</span>
                         <div style="font-size: 18px; font-weight: 600; color: white;" id="attendanceName">-</div>
                     </div>
                 </div>
@@ -240,7 +712,7 @@
                 <div class="card-header">
                     <div class="card-title">Team Activity</div>
                     <div class="card-icon">
-                        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3z"/></svg>
                     </div>
                 </div>
                 <div class="status-list" id="statusList">
@@ -259,7 +731,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h2>End of Day Report</h2>
-                <button class="modal-close" onclick="closeEodModal()">&times;</button>
+                <button class="modal-close" onclick="closeEodModal()">×</button>
             </div>
             <div class="modal-body">
                 <form id="eodForm">
@@ -286,12 +758,12 @@
         <div class="modal">
             <div class="modal-header">
                 <h2>Client Reports</h2>
-                <button class="modal-close" onclick="closeClientModal()">&times;</button>
+                <button class="modal-close" onclick="closeClientModal()">×</button>
             </div>
             <div class="modal-body">
                 <form id="clientForm">
                     <div id="clientBoxes"></div>
-                    <button type="button" class="submit-modal-btn" style="background: var(--hcm-panel); border: 1px solid var(--hcm-border); color: #94a3b8;" onclick="addClientBox()">+ Add Client</button>
+                    <button type="button" class="submit-modal-btn" style="background: var(--hcm-panel); border: 1px solid var(--hcm-border); color: #94a3b8; margin-bottom: 12px;" onclick="addClientBox()">+ Add Client</button>
                     <button type="submit" class="submit-modal-btn">Submit Reports</button>
                 </form>
             </div>
@@ -303,7 +775,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h2>Join the Team</h2>
-                <button class="modal-close" onclick="closeRegisterModal()">&times;</button>
+                <button class="modal-close" onclick="closeRegisterModal()">×</button>
             </div>
             <div class="modal-body">
                 <form id="registerForm">
@@ -322,7 +794,7 @@
                     <div class="form-group-modal">
                         <label class="form-label">Your Role *</label>
                         <div class="employee-type-group">
-                            <label class="employee-type-option" id="typeRegularOption">
+                            <label class="employee-type-option selected" id="typeRegularOption">
                                 <input type="radio" name="regType" value="regular" checked>
                                 <div class="icon">🎬</div>
                                 <div class="label">Editor</div>
@@ -344,81 +816,115 @@
                     </div>
                     <button type="submit" class="submit-modal-btn" id="registerBtn">Create Account</button>
                 </form>
-                <div id="registerSuccess" style="display: none;">
-                    <div class="success-icon">
-                        <div class="icon">✅</div>
-                        <h3>Account Created!</h3>
-                        <p>Please check your email to confirm your account, then log in.</p>
-                        <button class="submit-modal-btn" style="margin-top: 20px;" onclick="closeRegisterModal()">Got It</button>
-                    </div>
+                <div id="registerSuccess" style="display: none; text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 64px; margin-bottom: 20px;">✅</div>
+                    <h3 style="font-size: 20px; font-weight: 600; color: white; margin-bottom: 8px;">Account Created!</h3>
+                    <p style="color: #94a3b8;">Please check your email to confirm your account, then log in.</p>
+                    <button class="submit-modal-btn" style="margin-top: 20px;" onclick="closeRegisterModal()">Got It</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // High Con Marketing Attendance System v2.2 - Fixed boot sequence
+        // Configuration
         const SUPABASE_URL = 'https://uwnnpvepyyutrxsnhzku.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bm5wdmVweXl1dHJ4c25oemt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDk4NDMsImV4cCI6MjA4NjcyNTg0M30.qbf1dnPQ8srUc2EcwNHNz3HFz3v5_A7gKUS1ZWKV7vM';
         const SITE_URL = 'https://attendance-system-eight-virid.vercel.app';
         const MANAGER_PASSWORD = 'louie2024';
 
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+        // Initialize Supabase
+        let supabaseClient = null;
         let currentUser = null;
         let currentAttendanceId = null;
         let clientCount = 0;
-        let employees = [];
         let userSession = null;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                document.getElementById('bootScreen').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'block';
-                checkSession();
+        // Boot sequence - runs immediately
+        function startBoot() {
+            // Hide boot screen after animation
+            setTimeout(function() {
+                document.getElementById('bootScreen').style.transition = 'opacity 0.5s ease';
+                document.getElementById('bootScreen').style.opacity = '0';
+                
+                setTimeout(function() {
+                    document.getElementById('bootScreen').style.display = 'none';
+                    document.getElementById('appContainer').style.display = 'block';
+                    
+                    // Initialize Supabase and check session
+                    initSupabase();
+                }, 500);
             }, 2500);
-
+            
+            // Start clock
             updateTime();
             setInterval(updateTime, 1000);
-
-            document.getElementById('loginForm').addEventListener('submit', handleLogin);
-            document.getElementById('eodForm').addEventListener('submit', handleEodSubmit);
-            document.getElementById('clientForm').addEventListener('submit', handleClientSubmit);
-            document.getElementById('registerForm').addEventListener('submit', handleRegister);
-
-            setupEmployeeTypeToggle();
-        });
+        }
 
         function updateTime() {
             const now = new Date();
-            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const timeEl = document.getElementById('currentTime');
+            const dateEl = document.getElementById('currentDate');
+            
+            if (timeEl) {
+                timeEl.textContent = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+            }
+            
+            if (dateEl) {
+                dateEl.textContent = now.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            }
+        }
+
+        function initSupabase() {
+            try {
+                const { createClient } = supabase;
+                supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                checkSession();
+            } catch (e) {
+                console.log('Supabase init failed, showing login');
+                showLogin();
+            }
         }
 
         async function checkSession() {
-            const savedSession = localStorage.getItem('hcm_session');
-            if (savedSession) {
-                try {
+            if (!supabaseClient) {
+                showLogin();
+                return;
+            }
+            
+            try {
+                const savedSession = localStorage.getItem('hcm_session');
+                if (savedSession) {
                     userSession = JSON.parse(savedSession);
-                    // Add timeout for Supabase call
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 5000);
                     
-                    const { data: { user }, error } = await supabaseClient.auth.getUser(userSession.access_token, { 
-                        signal: controller.signal 
-                    });
-                    clearTimeout(timeoutId);
+                    // Quick timeout for session check
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('timeout')), 3000)
+                    );
+                    
+                    const sessionPromise = supabaseClient.auth.getUser(userSession.access_token);
+                    
+                    const { data: { user }, error } = await Promise.race([sessionPromise, timeoutPromise]);
                     
                     if (!error && user) {
                         currentUser = user;
                         showAttendance();
                         return;
                     }
-                } catch (e) {
-                    console.log('Session check failed or timed out, showing login');
                 }
+            } catch (e) {
+                console.log('Session check timed out or failed');
             }
+            
             showLogin();
         }
 
@@ -426,6 +932,9 @@
             document.getElementById('loginSection').style.display = 'block';
             document.getElementById('attendanceSection').style.display = 'none';
             document.getElementById('userSection').style.display = 'none';
+            
+            // Setup event listeners
+            setupEventListeners();
         }
 
         function showAttendance() {
@@ -433,8 +942,8 @@
             document.getElementById('attendanceSection').style.display = 'block';
             document.getElementById('userSection').style.display = 'flex';
             
-            const fullName = currentUser.user_metadata?.full_name || 'Team Member';
-            const role = currentUser.user_metadata?.employee_type || 'employee';
+            const fullName = currentUser?.user_metadata?.full_name || 'Team Member';
+            const role = currentUser?.user_metadata?.employee_type || 'employee';
             const initial = fullName.charAt(0).toUpperCase();
             
             document.getElementById('userNameDisplay').textContent = fullName;
@@ -448,527 +957,76 @@
             loadStatus();
         }
 
+        function setupEventListeners() {
+            // Remove old listeners to avoid duplicates
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm && !loginForm.dataset.setup) {
+                loginForm.addEventListener('submit', handleLogin);
+                loginForm.dataset.setup = 'true';
+            }
+            
+            const eodForm = document.getElementById('eodForm');
+            if (eodForm && !eodForm.dataset.setup) {
+                eodForm.addEventListener('submit', handleEodSubmit);
+                eodForm.dataset.setup = 'true';
+            }
+            
+            const clientForm = document.getElementById('clientForm');
+            if (clientForm && !clientForm.dataset.setup) {
+                clientForm.addEventListener('submit', handleClientSubmit);
+                clientForm.dataset.setup = 'true';
+            }
+            
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm && !registerForm.dataset.setup) {
+                registerForm.addEventListener('submit', handleRegister);
+                registerForm.dataset.setup = 'true';
+            }
+            
+            // Setup employee type toggle
+            const regularOption = document.getElementById('typeRegularOption');
+            const managerOption = document.getElementById('typeManagerOption');
+            
+            if (regularOption && !regularOption.dataset.setup) {
+                regularOption.addEventListener('click', function() {
+                    document.querySelector('input[name="regType"][value="regular"]').checked = true;
+                    this.classList.add('selected');
+                    managerOption.classList.remove('selected');
+                    document.getElementById('managerFields').style.display = 'none';
+                });
+                regularOption.dataset.setup = 'true';
+            }
+            
+            if (managerOption && !managerOption.dataset.setup) {
+                managerOption.addEventListener('click', function() {
+                    document.querySelector('input[name="regType"][value="manager"]').checked = true;
+                    this.classList.add('selected');
+                    regularOption.classList.remove('selected');
+                    document.getElementById('managerFields').style.display = 'block';
+                });
+                managerOption.dataset.setup = 'true';
+            }
+        }
+
         async function handleLogin(e) {
             e.preventDefault();
+            
+            if (!supabaseClient) {
+                showMessage('loginMessage', 'error', 'System initializing, please try again');
+                return;
+            }
+            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const btn = document.getElementById('loginBtn');
             const btnText = document.getElementById('loginBtnText');
             
             btn.disabled = true;
-            btnText.innerHTML = '<span class="loading"></span>Signing in...';
+            btnText.innerHTML = '<span class="loading-dots"></span>Signing in...';
             
             try {
                 const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                 if (error) throw error;
                 
                 if (!data.user.email_confirmed_at) {
-                    showMessage('loginMessage', 'info', 'Please check your email to confirm your account.');
-                    btn.disabled = false;
-                    btnText.textContent = 'Sign In';
-                    return;
-                }
-                
-                userSession = data.session;
-                localStorage.setItem('hcm_session', JSON.stringify(data.session));
-                currentUser = data.user;
-                
-                showMessage('loginMessage', 'success', 'Welcome back, ' + (data.user.user_metadata?.full_name || 'Team Member') + '!');
-                setTimeout(() => { showAttendance(); }, 800);
-            } catch (error) {
-                showMessage('loginMessage', 'error', error.message.includes('Invalid') ? 'Invalid email or password' : error.message);
-                btn.disabled = false;
-                btnText.textContent = 'Sign In';
-            }
-        }
-
-        function logout() {
-            supabaseClient.auth.signOut();
-            localStorage.removeItem('hcm_session');
-            currentUser = null;
-            userSession = null;
-            showLogin();
-            showMessage('loginMessage', 'info', 'You have been logged out.');
-        }
-
-        async function handleCheckin() {
-            const fullName = currentUser.user_metadata?.full_name;
-            const now = new Date();
-            
-            try {
-                const { data, error } = await supabaseClient.from('attendance_records').insert({
-                    name: fullName,
-                    check_in_time: now.toISOString(),
-                    date: now.toISOString().split('T')[0]
-                }).select().single();
-                
-                if (error) throw error;
-                
-                showMessage('attendanceMessage', 'success', 'Checked in at ' + now.toLocaleTimeString());
-                loadStatus();
-            } catch (error) {
-                if (error.message.includes('duplicate')) {
-                    showMessage('attendanceMessage', 'info', 'You are already checked in today!');
-                } else {
-                    showMessage('attendanceMessage', 'error', error.message);
-                }
-            }
-        }
-
-                a s y n c   f u n c t i o n   h a n d l e E o d S u b m i t ( e )   { 
- 
-                         e . p r e v e n t D e f a u l t ( ) ; 
- 
-                         t r y   { 
- 
-                                 c o n s t   n o w   =   n e w   D a t e ( ) ; 
- 
-                                 c o n s t   f u l l N a m e   =   c u r r e n t U s e r . u s e r _ m e t a d a t a ? . f u l l _ n a m e ; 
- 
-                                 
- 
-                                 a w a i t   s u p a b a s e C l i e n t . f r o m ( ' a t t e n d a n c e _ r e c o r d s ' ) . u p d a t e ( { 
- 
-                                         c h e c k _ o u t _ t i m e :   n o w . t o I S O S t r i n g ( ) 
- 
-                                 } ) . e q ( ' i d ' ,   c u r r e n t A t t e n d a n c e I d ) ; 
- 
-                                 
- 
-                                 a w a i t   s u p a b a s e C l i e n t . f r o m ( ' e o d _ r e p o r t s ' ) . i n s e r t ( { 
- 
-                                         a t t e n d a n c e _ i d :   c u r r e n t A t t e n d a n c e I d , 
- 
-                                         n a m e :   f u l l N a m e , 
- 
-                                         a c c o m p l i s h m e n t s :   d o c u m e n t . g e t E l e m e n t B y I d ( ' e o d A c c o m p l i s h m e n t s ' ) . v a l u e , 
- 
-                                         r e v i s i o n s _ d o n e :   d o c u m e n t . g e t E l e m e n t B y I d ( ' e o d R e v i s i o n s D o n e ' ) . v a l u e , 
- 
-                                         n e w _ v i d e o s _ c o u n t :   p a r s e I n t ( d o c u m e n t . g e t E l e m e n t B y I d ( ' e o d N e w V i d e o s C o u n t ' ) . v a l u e ) , 
- 
-                                         r e p o r t _ d a t e :   n o w . t o I S O S t r i n g ( ) . s p l i t ( ' T ' ) [ 0 ] 
- 
-                                 } ) ; 
- 
-                                 
- 
-                                 c l o s e E o d M o d a l ( ) ; 
- 
-                                 s h o w M e s s a g e ( ' a t t e n d a n c e M e s s a g e ' ,   ' s u c c e s s ' ,   ' E O D   R e p o r t   s u b m i t t e d ! ' ) ; 
- 
-                                 l o a d S t a t u s ( ) ; 
- 
-                                 d o c u m e n t . g e t E l e m e n t B y I d ( ' e o d F o r m ' ) . r e s e t ( ) ; 
- 
-                         }   c a t c h   ( e r r o r )   { 
- 
-                                 s h o w M e s s a g e ( ' a t t e n d a n c e M e s s a g e ' ,   ' e r r o r ' ,   e r r o r . m e s s a g e ) ; 
- 
-                         } 
- 
-                 } 
- 
- 
- 
-                 a s y n c   f u n c t i o n   h a n d l e C l i e n t S u b m i t ( e )   { 
- 
-                         e . p r e v e n t D e f a u l t ( ) ; 
- 
-                         t r y   { 
- 
-                                 c o n s t   n o w   =   n e w   D a t e ( ) ; 
- 
-                                 c o n s t   f u l l N a m e   =   c u r r e n t U s e r . u s e r _ m e t a d a t a ? . f u l l _ n a m e ; 
- 
-                                 
- 
-                                 a w a i t   s u p a b a s e C l i e n t . f r o m ( ' a t t e n d a n c e _ r e c o r d s ' ) . u p d a t e ( { 
- 
-                                         c h e c k _ o u t _ t i m e :   n o w . t o I S O S t r i n g ( ) 
- 
-                                 } ) . e q ( ' i d ' ,   c u r r e n t A t t e n d a n c e I d ) ; 
- 
-                                 
- 
-                                 c o n s t   c l i e n t B o x e s   =   d o c u m e n t . q u e r y S e l e c t o r A l l ( ' . f o r m - g r o u p - m o d a l [ i d ^ = " c l i e n t B o x " ] ' ) ; 
- 
-                                 c o n s t   c l i e n t R e p o r t s   =   [ ] ; 
- 
-                                 
- 
-                                 c l i e n t B o x e s . f o r E a c h ( b o x   = >   { 
- 
-                                         c o n s t   c l i e n t S e l e c t   =   b o x . q u e r y S e l e c t o r ( ' . c l i e n t - s e l e c t ' ) ; 
- 
-                                         c o n s t   n a m e I n p u t   =   b o x . q u e r y S e l e c t o r ( ' . c l i e n t - n a m e - i n p u t ' ) ; 
- 
-                                         c o n s t   r e p o r t   =   b o x . q u e r y S e l e c t o r ( ' . c l i e n t - r e p o r t ' ) ; 
- 
-                                         
- 
-                                         l e t   c l i e n t N a m e   =   c l i e n t S e l e c t . v a l u e ; 
- 
-                                         i f   ( c l i e n t N a m e   = = =   ' n e w ' )   { 
- 
-                                                 c l i e n t N a m e   =   n a m e I n p u t . v a l u e . t r i m ( ) ; 
- 
-                                         } 
- 
-                                         
- 
-                                         i f   ( c l i e n t N a m e   & &   r e p o r t . v a l u e . t r i m ( ) )   { 
- 
-                                                 c l i e n t R e p o r t s . p u s h ( { 
- 
-                                                         a t t e n d a n c e _ i d :   c u r r e n t A t t e n d a n c e I d , 
- 
-                                                         n a m e :   f u l l N a m e , 
- 
-                                                         c l i e n t _ n a m e :   c l i e n t N a m e , 
- 
-                                                         r e p o r t :   r e p o r t . v a l u e . t r i m ( ) , 
- 
-                                                         r e p o r t _ d a t e :   n o w . t o I S O S t r i n g ( ) . s p l i t ( ' T ' ) [ 0 ] 
- 
-                                                 } ) ; 
- 
-                                         } 
- 
-                                 } ) ; 
- 
-                                 
- 
-                                 i f   ( c l i e n t R e p o r t s . l e n g t h   >   0 )   { 
- 
-                                         a w a i t   s u p a b a s e C l i e n t . f r o m ( ' c l i e n t _ r e p o r t s ' ) . i n s e r t ( c l i e n t R e p o r t s ) ; 
- 
-                                 } 
- 
-                                 
- 
-                                 c l o s e C l i e n t M o d a l ( ) ; 
- 
-                                 s h o w M e s s a g e ( ' a t t e n d a n c e M e s s a g e ' ,   ' s u c c e s s ' ,   c l i e n t R e p o r t s . l e n g t h   +   '   c l i e n t   r e p o r t ( s )   s u b m i t t e d ! ' ) ; 
- 
-                                 l o a d S t a t u s ( ) ; 
- 
-                         }   c a t c h   ( e r r o r )   { 
- 
-                                 s h o w M e s s a g e ( ' a t t e n d a n c e M e s s a g e ' ,   ' e r r o r ' ,   e r r o r . m e s s a g e ) ; 
- 
-                         } 
- 
-                 } 
- 
- 
- 
-                 a s y n c   f u n c t i o n   h a n d l e R e g i s t e r ( e )   { 
- 
-                         e . p r e v e n t D e f a u l t ( ) ; 
- 
-                         c o n s t   n a m e   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' r e g N a m e ' ) . v a l u e ; 
- 
-                         c o n s t   e m a i l   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' r e g E m a i l ' ) . v a l u e ; 
- 
-                         c o n s t   p a s s w o r d   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' r e g P a s s w o r d ' ) . v a l u e ; 
- 
-                         c o n s t   t y p e   =   d o c u m e n t . q u e r y S e l e c t o r ( ' i n p u t [ n a m e = " r e g T y p e " ] : c h e c k e d ' ) . v a l u e ; 
- 
-                         c o n s t   r o l e   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' r e g R o l e ' ) . v a l u e ; 
- 
-                         c o n s t   m a n a g e r P a s s w o r d   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' m a n a g e r P a s s w o r d ' ) . v a l u e ; 
- 
-                         
- 
-                         i f   ( t y p e   = = =   ' m a n a g e r '   & &   m a n a g e r P a s s w o r d   ! = =   M A N A G E R _ P A S S W O R D )   { 
- 
-                                 a l e r t ( ' I n v a l i d   m a n a g e r   p a s s w o r d ! ' ) ; 
- 
-                                 r e t u r n ; 
- 
-                         } 
- 
-                         
- 
-                         t r y   { 
- 
-                                 c o n s t   {   d a t a ,   e r r o r   }   =   a w a i t   s u p a b a s e C l i e n t . a u t h . s i g n U p ( { 
- 
-                                         e m a i l :   e m a i l , 
- 
-                                         p a s s w o r d :   p a s s w o r d , 
- 
-                                         o p t i o n s :   { 
- 
-                                                 d a t a :   { 
- 
-                                                         f u l l _ n a m e :   n a m e , 
- 
-                                                         e m p l o y e e _ t y p e :   t y p e , 
- 
-                                                         r o l e :   r o l e   | |   ' E m p l o y e e ' 
- 
-                                                 } , 
- 
-                                                 e m a i l R e d i r e c t T o :   S I T E _ U R L 
- 
-                                         } 
- 
-                                 } ) ; 
- 
-                                 
- 
-                                 i f   ( e r r o r )   t h r o w   e r r o r ; 
- 
-                                 
- 
-                                 c o n s t   {   e r r o r :   e m p E r r o r   }   =   a w a i t   s u p a b a s e C l i e n t . f r o m ( ' e m p l o y e e s ' ) . i n s e r t ( { 
- 
-                                         i d :   d a t a . u s e r . i d , 
- 
-                                         n a m e :   n a m e , 
- 
-                                         e m a i l :   e m a i l , 
- 
-                                         t y p e :   t y p e , 
- 
-                                         r o l e :   r o l e   | |   ' E m p l o y e e ' 
- 
-                                 } ) ; 
- 
-                                 
- 
-                                 i f   ( e m p E r r o r )   c o n s o l e . e r r o r ( ' E r r o r   s a v i n g   t o   e m p l o y e e s : ' ,   e m p E r r o r ) ; 
- 
-                                 
- 
-                                 d o c u m e n t . g e t E l e m e n t B y I d ( ' r e g i s t e r F o r m ' ) . s t y l e . d i s p l a y   =   ' n o n e ' ; 
- 
-                                 d o c u m e n t . g e t E l e m e n t B y I d ( ' r e g i s t e r S u c c e s s ' ) . s t y l e . d i s p l a y   =   ' b l o c k ' ; 
- 
-                         }   c a t c h   ( e r r o r )   { 
- 
-                                 a l e r t ( ' R e g i s t r a t i o n   f a i l e d :   '   +   e r r o r . m e s s a g e ) ; 
- 
-                         } 
- 
-                 } 
- 
- 
- 
-                 a s y n c   f u n c t i o n   l o a d S t a t u s ( )   { 
- 
-                         t r y   { 
- 
-                                 c o n s t   {   d a t a ,   e r r o r   }   =   a w a i t   s u p a b a s e C l i e n t . f r o m ( ' a t t e n d a n c e _ r e c o r d s ' ) . s e l e c t ( ' * ' ) . i s ( ' c h e c k _ o u t _ t i m e ' ,   n u l l ) ; 
- 
-                                 i f   ( e r r o r )   t h r o w   e r r o r ; 
- 
-                                 r e n d e r S t a t u s ( d a t a   | |   [ ] ) ; 
- 
-                         }   c a t c h   ( e r r o r )   { 
- 
-                                 r e n d e r S t a t u s ( [ ] ) ; 
- 
-                         } 
- 
-                 } 
- 
- 
- 
-                 f u n c t i o n   r e n d e r S t a t u s ( r e c o r d s )   { 
- 
-                         c o n s t   c o n t a i n e r   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' s t a t u s L i s t ' ) ; 
- 
-                         i f   ( r e c o r d s . l e n g t h   = = =   0 )   { 
- 
-                                 c o n t a i n e r . i n n e r H T M L   =   ' < p   s t y l e = " c o l o r :   # 9 4 a 3 b 8 ;   t e x t - a l i g n :   c e n t e r ;   p a d d i n g :   2 0 p x ; " > N o   a c t i v e   t e a m   m e m b e r s < / p > ' ; 
- 
-                                 r e t u r n ; 
- 
-                         } 
- 
-                         c o n t a i n e r . i n n e r H T M L   =   r e c o r d s . m a p ( r   = >   ' < d i v   c l a s s = " s t a t u s - i t e m " > < s p a n   c l a s s = " s t a t u s - n a m e " > '   +   r . n a m e   +   ' < / s p a n > < s p a n   c l a s s = " s t a t u s - b a d g e   a c t i v e " > A c t i v e < / s p a n > < / d i v > ' ) . j o i n ( ' ' ) ; 
- 
-                 } 
- 
- 
- 
-                 f u n c t i o n   s e t u p E m p l o y e e T y p e T o g g l e ( )   { 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' t y p e R e g u l a r O p t i o n ' ) . a d d E v e n t L i s t e n e r ( ' c l i c k ' ,   f u n c t i o n ( )   { 
- 
-                                 d o c u m e n t . q u e r y S e l e c t o r ( ' i n p u t [ n a m e = " r e g T y p e " ] [ v a l u e = " r e g u l a r " ] ' ) . c h e c k e d   =   t r u e ; 
- 
-                                 t h i s . c l a s s L i s t . a d d ( ' s e l e c t e d ' ) ; 
- 
-                                 d o c u m e n t . g e t E l e m e n t B y I d ( ' t y p e M a n a g e r O p t i o n ' ) . c l a s s L i s t . r e m o v e ( ' s e l e c t e d ' ) ; 
- 
-                                 d o c u m e n t . g e t E l e m e n t B y I d ( ' m a n a g e r F i e l d s ' ) . s t y l e . d i s p l a y   =   ' n o n e ' ; 
- 
-                         } ) ; 
- 
-                         
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' t y p e M a n a g e r O p t i o n ' ) . a d d E v e n t L i s t e n e r ( ' c l i c k ' ,   f u n c t i o n ( )   { 
- 
-                                 d o c u m e n t . q u e r y S e l e c t o r ( ' i n p u t [ n a m e = " r e g T y p e " ] [ v a l u e = " m a n a g e r " ] ' ) . c h e c k e d   =   t r u e ; 
- 
-                                 t h i s . c l a s s L i s t . a d d ( ' s e l e c t e d ' ) ; 
- 
-                                 d o c u m e n t . g e t E l e m e n t B y I d ( ' t y p e R e g u l a r O p t i o n ' ) . c l a s s L i s t . r e m o v e ( ' s e l e c t e d ' ) ; 
- 
-                                 d o c u m e n t . g e t E l e m e n t B y I d ( ' m a n a g e r F i e l d s ' ) . s t y l e . d i s p l a y   =   ' b l o c k ' ; 
- 
-                         } ) ; 
- 
-                         
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' t y p e R e g u l a r O p t i o n ' ) . c l a s s L i s t . a d d ( ' s e l e c t e d ' ) ; 
- 
-                 } 
- 
- 
- 
-                 f u n c t i o n   s h o w R e g i s t e r M o d a l ( )   { 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' r e g i s t e r M o d a l ' ) . c l a s s L i s t . a d d ( ' s h o w ' ) ; 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' r e g i s t e r F o r m ' ) . s t y l e . d i s p l a y   =   ' b l o c k ' ; 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' r e g i s t e r S u c c e s s ' ) . s t y l e . d i s p l a y   =   ' n o n e ' ; 
- 
-                 } 
- 
- 
- 
-                 f u n c t i o n   c l o s e R e g i s t e r M o d a l ( )   { 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' r e g i s t e r M o d a l ' ) . c l a s s L i s t . r e m o v e ( ' s h o w ' ) ; 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' r e g i s t e r F o r m ' ) . r e s e t ( ) ; 
- 
-                 } 
- 
- 
- 
-                 f u n c t i o n   o p e n E o d M o d a l ( )   { 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' e o d M o d a l ' ) . c l a s s L i s t . a d d ( ' s h o w ' ) ; 
- 
-                 } 
- 
- 
- 
-                 f u n c t i o n   c l o s e E o d M o d a l ( )   { 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' e o d M o d a l ' ) . c l a s s L i s t . r e m o v e ( ' s h o w ' ) ; 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' e o d F o r m ' ) . r e s e t ( ) ; 
- 
-                 } 
- 
- 
- 
-                 f u n c t i o n   o p e n C l i e n t M o d a l ( )   { 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' c l i e n t M o d a l ' ) . c l a s s L i s t . a d d ( ' s h o w ' ) ; 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' c l i e n t B o x e s ' ) . i n n e r H T M L   =   ' ' ; 
- 
-                         c l i e n t C o u n t   =   0 ; 
- 
-                         a d d C l i e n t B o x ( ) ; 
- 
-                 } 
- 
- 
- 
-                 f u n c t i o n   c l o s e C l i e n t M o d a l ( )   { 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' c l i e n t M o d a l ' ) . c l a s s L i s t . r e m o v e ( ' s h o w ' ) ; 
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' c l i e n t B o x e s ' ) . i n n e r H T M L   =   ' ' ; 
- 
-                 } 
- 
- 
- 
-                 f u n c t i o n   a d d C l i e n t B o x ( )   { 
- 
-                         c l i e n t C o u n t + + ; 
- 
-                         c o n s t   c l i e n t L i s t   =   [ 
- 
-                                 ' P o d c a s t   P r i n c i p l e s ' ,   ' M a r k e t U ' ,   ' S a n d y ' ,   ' C h r i s   V a s q u e z   ( V i d e o   C E O   C l i e n t s ) ' ,   ' A p e x   ( T y l e r ) ' , 
- 
-                                 ' M o o d   S t u d i o s   ( A l e x ) ' ,   ' J o r d a n ' 
- 
-                         ] ; 
- 
-                         
- 
-                         l e t   o p t i o n s   =   ' ' ; 
- 
-                         c l i e n t L i s t . f o r E a c h ( c l i e n t   = >   { 
- 
-                                 o p t i o n s   + =   ' < o p t i o n   v a l u e = " '   +   c l i e n t   +   ' " > '   +   c l i e n t   +   ' < / o p t i o n > ' ; 
- 
-                         } ) ; 
- 
-                         o p t i o n s   + =   ' < o p t i o n   v a l u e = " n e w " > +   A d d   N e w   C l i e n t < / o p t i o n > ' ; 
- 
-                         
- 
-                         c o n s t   h t m l   =   ' < d i v   c l a s s = " f o r m - g r o u p - m o d a l "   i d = " c l i e n t B o x '   +   c l i e n t C o u n t   +   ' "   s t y l e = " b a c k g r o u n d :   v a r ( - - h c m - b g ) ;   p a d d i n g :   1 6 p x ;   b o r d e r - r a d i u s :   1 2 p x ;   m a r g i n - b o t t o m :   1 2 p x ; " > < d i v   s t y l e = " d i s p l a y :   f l e x ;   j u s t i f y - c o n t e n t :   s p a c e - b e t w e e n ;   a l i g n - i t e m s :   c e n t e r ;   m a r g i n - b o t t o m :   1 2 p x ; " > < s t r o n g   s t y l e = " c o l o r :   v a r ( - - h c m - p r i m a r y ) ; " > C l i e n t   # '   +   c l i e n t C o u n t   +   ' < / s t r o n g > '   +   ( c l i e n t C o u n t   >   1   ?   ' < b u t t o n   t y p e = " b u t t o n "   s t y l e = " b a c k g r o u n d :   r g b a ( 2 3 9 , 6 8 , 6 8 , 0 . 1 ) ;   b o r d e r :   1 p x   s o l i d   # e f 4 4 4 4 ;   c o l o r :   # e f 4 4 4 4 ;   p a d d i n g :   6 p x   1 2 p x ;   b o r d e r - r a d i u s :   8 p x ;   c u r s o r :   p o i n t e r ;   f o n t - s i z e :   1 2 p x ; "   o n c l i c k = " d o c u m e n t . g e t E l e m e n t B y I d ( \ ' c l i e n t B o x '   +   c l i e n t C o u n t   +   ' \ ' ) . r e m o v e ( ) " > R e m o v e < / b u t t o n > '   :   ' ' )   +   ' < / d i v > < d i v   s t y l e = " m a r g i n - b o t t o m :   1 2 p x ; " > < s e l e c t   c l a s s = " f o r m - i n p u t   c l i e n t - s e l e c t "   o n c h a n g e = " h a n d l e C l i e n t S e l e c t ( t h i s ) "   s t y l e = " w i d t h :   1 0 0 % ; " > < o p t i o n   v a l u e = " " > S e l e c t   c l i e n t . . . < / o p t i o n > '   +   o p t i o n s   +   ' < / s e l e c t > < / d i v > < i n p u t   t y p e = " t e x t "   c l a s s = " c l i e n t - n a m e - i n p u t "   p l a c e h o l d e r = " C l i e n t   n a m e "   s t y l e = " w i d t h :   1 0 0 % ;   p a d d i n g :   1 0 p x   1 4 p x ;   b a c k g r o u n d :   v a r ( - - h c m - p a n e l ) ;   b o r d e r :   1 p x   s o l i d   v a r ( - - h c m - b o r d e r ) ;   b o r d e r - r a d i u s :   8 p x ;   m a r g i n - b o t t o m :   1 2 p x ;   d i s p l a y :   n o n e ; " > < t e x t a r e a   c l a s s = " f o r m - i n p u t   c l i e n t - r e p o r t "   p l a c e h o l d e r = " R e p o r t   f o r   t h i s   c l i e n t . . . "   s t y l e = " w i d t h :   1 0 0 % ;   p a d d i n g :   1 0 p x   1 4 p x ;   b a c k g r o u n d :   v a r ( - - h c m - p a n e l ) ;   b o r d e r :   1 p x   s o l i d   v a r ( - - h c m - b o r d e r ) ;   b o r d e r - r a d i u s :   8 p x ;   m i n - h e i g h t :   8 0 p x ;   r e s i z e :   v e r t i c a l ; " > < / t e x t a r e a > < / d i v > ' ; 
- 
-                         
- 
-                         d o c u m e n t . g e t E l e m e n t B y I d ( ' c l i e n t B o x e s ' ) . i n s e r t A d j a c e n t H T M L ( ' b e f o r e e n d ' ,   h t m l ) ; 
- 
-                 } 
- 
- 
- 
-                 f u n c t i o n   h a n d l e C l i e n t S e l e c t ( s e l e c t )   { 
- 
-                         c o n s t   n a m e I n p u t   =   s e l e c t . p a r e n t E l e m e n t . p a r e n t E l e m e n t . q u e r y S e l e c t o r ( ' . c l i e n t - n a m e - i n p u t ' ) ; 
- 
-                         i f   ( s e l e c t . v a l u e   = = =   ' n e w ' )   { 
- 
-                                 n a m e I n p u t . s t y l e . d i s p l a y   =   ' b l o c k ' ; 
- 
-                                 n a m e I n p u t . r e q u i r e d   =   t r u e ; 
- 
-                         }   e l s e   { 
- 
-                                 n a m e I n p u t . s t y l e . d i s p l a y   =   ' n o n e ' ; 
- 
-                                 n a m e I n p u t . r e q u i r e d   =   f a l s e ; 
- 
-                         } 
- 
-                 } 
- 
- 
- 
-                 f u n c t i o n   s h o w M e s s a g e ( e l e m e n t I d ,   t y p e ,   t e x t )   { 
- 
-                         c o n s t   e l   =   d o c u m e n t . g e t E l e m e n t B y I d ( e l e m e n t I d ) ; 
- 
-                         e l . c l a s s N a m e   =   ' m e s s a g e   s h o w   '   +   t y p e ; 
- 
-                         e l . t e x t C o n t e n t   =   t e x t ; 
- 
-                         s e t T i m e o u t ( ( )   = >   {   e l . c l a s s L i s t . r e m o v e ( ' s h o w ' ) ;   } ,   5 0 0 0 ) ; 
- 
-                 } 
- 
-         < / s c r i p t > 
- 
- < / b o d y > 
- 
- < / h t m l > 
- 
- 
+                    showMessage
