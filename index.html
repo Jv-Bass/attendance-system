@@ -1023,7 +1023,7 @@
             try {
                 const { error } = await supabaseClient.from('eod_reports').insert({
                     employee_name: currentUser?.user_metadata?.full_name,
-                    accomplishments: accomplishments,
+                    videos_done: accomplishments,
                     revisions_done: revisionsDone,
                     new_videos_count: parseInt(newVideosCount)
                 });
