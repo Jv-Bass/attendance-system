@@ -47,14 +47,11 @@
             justify-content: center; align-items: center; z-index: 9999;
         }
         .boot-logo {
-            width: 100px; height: 100px;
-            background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-secondary));
-            border-radius: 24px;
+            width: 120px; height: 120px;
             display: flex; justify-content: center; align-items: center;
             animation: bootSequence 2.5s ease forwards;
-            box-shadow: var(--hcm-glow);
         }
-        .boot-logo svg { width: 50px; height: 50px; fill: white; }
+        .boot-logo img { width: 100%; height: 100%; object-fit: contain; }
         .boot-text {
             margin-top: 24px; font-size: 18px; font-weight: 600;
             color: white;
@@ -160,9 +157,7 @@
 <body>
     <div id="bootScreen">
         <div class="boot-logo">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45L12 11.09 5.1 7.63 12 4.18zM4 8.82l7 3.5v7.36l-7-3.5V8.82zm9 10.86v-7.36l7-3.5v7.36l-7 3.5z"/>
-            </svg>
+            <img src="logo.png" alt="HCM Logo">
         </div>
         <div class="boot-text">HIGH CON MARKETING</div>
         <div class="boot-bar"><div class="boot-bar-fill"></div></div>
@@ -171,7 +166,7 @@
     <div id="appContainer">
         <div class="header-bar">
             <div class="logo">
-                <svg viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l6.9 3.45L12 11.09 5.1 7.63 12 4.18zM4 8.82l7 3.5v7.36l-7-3.5V8.82zm9 10.86v-7.36l7-3.5v7.36l-7 3.5z"/></svg>
+                <img src="logo.png" alt="HCM Logo" style="height: 36px; width: auto;">
                 <div class="logo-text">HIGH <span>CON</span></div>
             </div>
             <div class="user-section" id="userSection" style="display: none;">
