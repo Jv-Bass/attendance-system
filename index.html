@@ -401,14 +401,22 @@
             if (savedSession) {
                 try {
                     userSession = JSON.parse(savedSession);
-                    const { data: { user }, error } = await supabaseClient.auth.getUser(userSession.access_token);
+                    // Add timeout for Supabase call
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+                    
+                    const { data: { user }, error } = await supabaseClient.auth.getUser(userSession.access_token, { 
+                        signal: controller.signal 
+                    });
+                    clearTimeout(timeoutId);
+                    
                     if (!error && user) {
                         currentUser = user;
                         showAttendance();
                         return;
                     }
                 } catch (e) {
-                    console.log('Session check failed, showing login');
+                    console.log('Session check failed or timed out, showing login');
                 }
             }
             showLogin();
