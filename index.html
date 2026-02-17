@@ -891,6 +891,11 @@
                     btnText.textContent = 'Sign In';
                     return;
                 }
+                // IMPORTANT: Set session on client to ensure auth context is available
+                await supabaseClient.auth.setSession({
+                    access_token: data.session.access_token,
+                    refresh_token: data.session.refresh_token
+                });
                 userSession = data.session;
                 localStorage.setItem('hcm_session', JSON.stringify(data.session));
                 currentUser = data.user;
