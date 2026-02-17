@@ -850,8 +850,7 @@
                 setTimeout(function() {
                     document.getElementById('bootScreen').style.display = 'none';
                     document.getElementById('appContainer').style.display = 'block';
-                    
-                    // Initialize Supabase and check session
+                    // Initialize Supabase AFTER showing app
                     initSupabase();
                 }, 500);
             }, 2500);
@@ -888,43 +887,34 @@
             try {
                 const { createClient } = supabase;
                 supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                checkSession();
+                // Try to restore session in background - don't block UI
+                restoreSessionInBackground();
             } catch (e) {
-                console.log('Supabase init failed, showing login');
-                showLogin();
+                console.log('Supabase init failed');
             }
         }
 
-        async function checkSession() {
-            if (!supabaseClient) {
-                showLogin();
-                return;
-            }
-            
-            try {
-                const savedSession = localStorage.getItem('hcm_session');
-                if (savedSession) {
+        function restoreSessionInBackground() {
+            const savedSession = localStorage.getItem('hcm_session');
+            if (savedSession) {
+                try {
                     userSession = JSON.parse(savedSession);
-                    
-                    // Quick timeout for session check
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('timeout')), 3000)
-                    );
-                    
-                    const sessionPromise = supabaseClient.auth.getUser(userSession.access_token);
-                    
-                    const { data: { user }, error } = await Promise.race([sessionPromise, timeoutPromise]);
-                    
-                    if (!error && user) {
-                        currentUser = user;
-                        showAttendance();
-                        return;
-                    }
+                    supabaseClient.auth.getUser(userSession.access_token).then(function(result) {
+                        if (result.data && result.data.user) {
+                            currentUser = result.data.user;
+                            showAttendance();
+                        }
+                    }).catch(function(e) {
+                        // Session expired, stay on login
+                    });
+                } catch (e) {
+                    // Invalid session
                 }
-            } catch (e) {
-                console.log('Session check timed out or failed');
             }
-            
+        }
+
+        function checkSession() {
+            // Don't block - just show login
             showLogin();
         }
 
