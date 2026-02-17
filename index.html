@@ -22,8 +22,6 @@
             color: #e2e8f0;
             overflow-x: hidden;
         }
-        
-        /* Boot Screen */
         #bootScreen {
             position: fixed;
             top: 0;
@@ -37,7 +35,6 @@
             align-items: center;
             z-index: 9999;
         }
-        
         .boot-logo-container {
             position: relative;
             width: 120px;
@@ -46,7 +43,6 @@
             justify-content: center;
             align-items: center;
         }
-        
         .boot-logo-ring {
             position: absolute;
             width: 100%;
@@ -56,7 +52,6 @@
             border-radius: 50%;
             animation: rotate 1s linear infinite;
         }
-        
         .boot-logo-ring:nth-child(2) {
             width: 80%;
             height: 80%;
@@ -64,7 +59,6 @@
             animation-direction: reverse;
             animation-duration: 1.5s;
         }
-        
         .boot-logo-text {
             font-size: 28px;
             font-weight: 800;
@@ -72,28 +66,23 @@
             letter-spacing: 2px;
             text-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
         }
-        
         @keyframes rotate {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        
         @keyframes pulse {
             0%, 100% { opacity: 0.6; }
             50% { opacity: 1; }
         }
-        
         @keyframes zoomIn {
             from { opacity: 0; transform: scale(0.8); }
             to { opacity: 1; transform: scale(1); }
         }
-        
         .boot-loading {
             margin-top: 30px;
             display: flex;
             gap: 8px;
         }
-        
         .boot-loading span {
             width: 10px;
             height: 10px;
@@ -101,17 +90,13 @@
             border-radius: 50%;
             animation: pulse 1.4s ease-in-out infinite;
         }
-        
         .boot-loading span:nth-child(2) { animation-delay: 0.2s; }
         .boot-loading span:nth-child(3) { animation-delay: 0.4s; }
-        
-        /* Main App */
         #appContainer {
             display: none;
             min-height: 100vh;
             position: relative;
         }
-        
         .header-bar {
             background: linear-gradient(135deg, var(--hcm-panel), var(--hcm-bg));
             border-bottom: 1px solid var(--hcm-border);
@@ -120,13 +105,11 @@
             justify-content: space-between;
             align-items: center;
         }
-        
         .logo {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-        
         .logo-icon {
             width: 36px;
             height: 36px;
@@ -139,23 +122,19 @@
             font-size: 14px;
             color: white;
         }
-        
         .logo-text {
             font-size: 18px;
             font-weight: 700;
             color: white;
         }
-        
         .logo-text span {
             color: var(--hcm-secondary);
         }
-        
         .user-section {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-        
         .user-avatar {
             width: 36px;
             height: 36px;
@@ -168,23 +147,19 @@
             font-weight: 700;
             font-size: 14px;
         }
-        
         .user-info {
             text-align: right;
         }
-        
         .user-name {
             font-size: 14px;
             color: white;
             font-weight: 500;
         }
-        
         .user-role {
             font-size: 11px;
             color: var(--hcm-secondary);
             text-transform: uppercase;
         }
-        
         .logout-btn {
             background: transparent;
             border: 1px solid var(--hcm-border);
@@ -195,31 +170,26 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
         .logout-btn:hover {
             border-color: var(--hcm-primary);
             color: var(--hcm-primary);
         }
-        
         .main-header {
             background: linear-gradient(135deg, var(--hcm-panel) 0%, var(--hcm-bg) 100%);
             padding: 32px 24px;
             text-align: center;
             border-bottom: 1px solid var(--hcm-border);
         }
-        
         .main-header h1 {
             font-size: 28px;
             font-weight: 700;
             color: white;
             margin-bottom: 4px;
         }
-        
         .main-header p {
             color: #94a3b8;
             font-size: 14px;
         }
-        
         .time-display {
             margin-top: 16px;
             font-size: 48px;
@@ -228,19 +198,16 @@
             font-weight: 700;
             letter-spacing: 2px;
         }
-        
         .date-display {
             font-size: 14px;
             color: #94a3b8;
             margin-top: 4px;
         }
-        
         .main-content {
             max-width: 500px;
             margin: 0 auto;
             padding: 24px;
         }
-        
         .card {
             background: var(--hcm-panel);
             border: 1px solid var(--hcm-border);
@@ -251,7 +218,6 @@
             position: relative;
             overflow: hidden;
         }
-        
         .card::before {
             content: '';
             position: absolute;
@@ -261,20 +227,17 @@
             height: 4px;
             background: linear-gradient(90deg, var(--hcm-primary), var(--hcm-secondary));
         }
-        
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-        
         .card-title {
             font-size: 16px;
             font-weight: 600;
             color: white;
         }
-        
         .card-icon {
             width: 44px;
             height: 44px;
@@ -284,17 +247,14 @@
             align-items: center;
             justify-content: center;
         }
-        
         .card-icon svg {
             width: 22px;
             height: 22px;
             fill: var(--hcm-primary);
         }
-        
         .form-group {
             margin-bottom: 20px;
         }
-        
         .form-label {
             display: block;
             font-size: 13px;
@@ -302,7 +262,6 @@
             margin-bottom: 8px;
             font-weight: 500;
         }
-        
         .form-input {
             width: 100%;
             padding: 14px 16px;
@@ -313,13 +272,11 @@
             font-size: 15px;
             transition: all 0.3s ease;
         }
-        
         .form-input:focus {
             outline: none;
             border-color: var(--hcm-primary);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
-        
         .btn {
             width: 100%;
             padding: 16px;
@@ -330,34 +287,28 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
         .btn-primary {
             background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-primary-dim));
             color: white;
         }
-        
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
         }
-        
         .btn-secondary {
             background: transparent;
             border: 2px solid var(--hcm-border);
             color: #94a3b8;
         }
-        
         .btn-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
-        
         .status-list {
             max-height: 300px;
             overflow-y: auto;
         }
-        
         .status-item {
             display: flex;
             justify-content: space-between;
@@ -365,29 +316,24 @@
             padding: 14px 0;
             border-bottom: 1px solid var(--hcm-border);
         }
-        
         .status-item:last-child {
             border-bottom: none;
         }
-        
         .status-name {
             font-size: 14px;
             color: white;
         }
-        
         .status-badge {
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 600;
         }
-        
         .status-badge.active {
             background: rgba(34, 197, 94, 0.1);
             border: 1px solid #22c55e;
             color: #22c55e;
         }
-        
         .message {
             padding: 14px;
             border-radius: 10px;
@@ -396,35 +342,29 @@
             font-size: 14px;
             font-weight: 500;
         }
-        
         .message.show {
             display: block;
         }
-        
         .message.success {
             background: rgba(34, 197, 94, 0.1);
             border: 1px solid #22c55e;
             color: #22c55e;
         }
-        
         .message.error {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid #ef4444;
             color: #ef4444;
         }
-        
         .message.info {
             background: rgba(37, 99, 235, 0.1);
             border: 1px solid var(--hcm-primary);
             color: var(--hcm-primary);
         }
-        
         .links {
             text-align: center;
             padding-top: 20px;
             border-top: 1px solid var(--hcm-border);
         }
-        
         .links a {
             color: #94a3b8;
             text-decoration: none;
@@ -432,16 +372,13 @@
             margin: 0 10px;
             transition: color 0.3s ease;
         }
-        
         .links a:hover {
             color: var(--hcm-primary);
         }
-        
         .links a.register-link {
             color: var(--hcm-primary);
             font-weight: 500;
         }
-        
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -456,11 +393,9 @@
             z-index: 1000;
             padding: 20px;
         }
-        
         .modal-overlay.show {
             display: flex;
         }
-        
         .modal {
             background: var(--hcm-panel);
             border: 1px solid var(--hcm-border);
@@ -472,7 +407,6 @@
             animation: zoomIn 0.3s ease;
             position: relative;
         }
-        
         .modal::before {
             content: '';
             position: absolute;
@@ -482,20 +416,17 @@
             height: 4px;
             background: linear-gradient(90deg, var(--hcm-primary), var(--hcm-secondary));
         }
-        
         .modal-header {
             padding: 24px 24px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
         .modal-header h2 {
             font-size: 18px;
             font-weight: 600;
             color: white;
         }
-        
         .modal-close {
             background: transparent;
             border: none;
@@ -505,19 +436,15 @@
             transition: color 0.3s ease;
             line-height: 1;
         }
-        
         .modal-close:hover {
             color: white;
         }
-        
         .modal-body {
             padding: 0 24px 24px;
         }
-        
         .form-group-modal {
             margin-bottom: 20px;
         }
-        
         .submit-modal-btn {
             width: 100%;
             padding: 16px;
@@ -531,23 +458,19 @@
             transition: all 0.3s ease;
             margin-top: 12px;
         }
-        
         .submit-modal-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
         }
-        
         textarea.form-input {
             min-height: 100px;
             resize: vertical;
         }
-        
         .employee-type-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
-        
         .employee-type-option {
             background: var(--hcm-bg);
             border: 2px solid var(--hcm-border);
@@ -557,37 +480,30 @@
             transition: all 0.3s ease;
             text-align: center;
         }
-        
         .employee-type-option:hover {
             border-color: var(--hcm-primary-dim);
         }
-        
         .employee-type-option.selected {
             border-color: var(--hcm-primary);
             background: rgba(37, 99, 235, 0.05);
         }
-        
         .employee-type-option input {
             display: none;
         }
-        
         .employee-type-option .icon {
             font-size: 28px;
             margin-bottom: 8px;
         }
-        
         .employee-type-option .label {
             font-size: 14px;
             font-weight: 600;
             color: white;
         }
-        
         .employee-type-option .desc {
             font-size: 11px;
             color: #94a3b8;
             margin-top: 4px;
         }
-        
         .welcome-badge {
             background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-secondary));
             padding: 4px 12px;
@@ -598,13 +514,11 @@
             margin-bottom: 4px;
             display: inline-block;
         }
-        
         .user-greeting {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
         .loading-dots {
             display: inline-block;
             width: 20px;
@@ -615,14 +529,12 @@
             animation: rotate 0.8s linear infinite;
             margin-right: 8px;
         }
-        
         @media (max-width: 500px) {
             .time-display { font-size: 36px; }
         }
     </style>
 </head>
 <body>
-    <!-- Boot Screen -->
     <div id="bootScreen">
         <div class="boot-logo-container">
             <div class="boot-logo-ring"></div>
@@ -636,7 +548,6 @@
         </div>
     </div>
 
-    <!-- Main App -->
     <div id="appContainer">
         <div class="header-bar">
             <div class="logo">
@@ -726,7 +637,6 @@
         </div>
     </div>
 
-    <!-- EOD Modal -->
     <div class="modal-overlay" id="eodModal">
         <div class="modal">
             <div class="modal-header">
@@ -753,7 +663,6 @@
         </div>
     </div>
 
-    <!-- Client Modal -->
     <div class="modal-overlay" id="clientModal">
         <div class="modal">
             <div class="modal-header">
@@ -770,7 +679,6 @@
         </div>
     </div>
 
-    <!-- Register Modal -->
     <div class="modal-overlay" id="registerModal">
         <div class="modal">
             <div class="modal-header">
@@ -827,35 +735,27 @@
     </div>
 
     <script>
-        // Configuration
         const SUPABASE_URL = 'https://uwnnpvepyyutrxsnhzku.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bm5wdmVweXl1dHJ4c25oemt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDk4NDMsImV4cCI6MjA4NjcyNTg0M30.qbf1dnPQ8srUc2EcwNHNz3HFz3v5_A7gKUS1ZWKV7vM';
         const SITE_URL = 'https://attendance-system-eight-virid.vercel.app';
         const MANAGER_PASSWORD = 'louie2024';
 
-        // Initialize Supabase
         let supabaseClient = null;
         let currentUser = null;
         let currentAttendanceId = null;
         let clientCount = 0;
         let userSession = null;
 
-        // Boot sequence - runs immediately
         function startBoot() {
-            // Hide boot screen after animation
             setTimeout(function() {
                 document.getElementById('bootScreen').style.transition = 'opacity 0.5s ease';
                 document.getElementById('bootScreen').style.opacity = '0';
-                
                 setTimeout(function() {
                     document.getElementById('bootScreen').style.display = 'none';
                     document.getElementById('appContainer').style.display = 'block';
-                    // Initialize Supabase AFTER showing app
                     initSupabase();
                 }, 500);
             }, 2500);
-            
-            // Start clock
             updateTime();
             setInterval(updateTime, 1000);
         }
@@ -864,22 +764,11 @@
             const now = new Date();
             const timeEl = document.getElementById('currentTime');
             const dateEl = document.getElementById('currentDate');
-            
             if (timeEl) {
-                timeEl.textContent = now.toLocaleTimeString('en-US', { 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    second: '2-digit' 
-                });
+                timeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             }
-            
             if (dateEl) {
-                dateEl.textContent = now.toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
+                dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             }
         }
 
@@ -887,10 +776,10 @@
             try {
                 const { createClient } = supabase;
                 supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                // Try to restore session in background - don't block UI
                 restoreSessionInBackground();
             } catch (e) {
                 console.log('Supabase init failed');
+                showLogin();
             }
         }
 
@@ -903,18 +792,11 @@
                         if (result.data && result.data.user) {
                             currentUser = result.data.user;
                             showAttendance();
+                            return;
                         }
-                    }).catch(function(e) {
-                        // Session expired, stay on login
-                    });
-                } catch (e) {
-                    // Invalid session
-                }
+                    }).catch(function(e) {});
+                } catch (e) {}
             }
-        }
-
-        function checkSession() {
-            // Don't block - just show login
             showLogin();
         }
 
@@ -922,8 +804,6 @@
             document.getElementById('loginSection').style.display = 'block';
             document.getElementById('attendanceSection').style.display = 'none';
             document.getElementById('userSection').style.display = 'none';
-            
-            // Setup event listeners
             setupEventListeners();
         }
 
@@ -931,52 +811,41 @@
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('attendanceSection').style.display = 'block';
             document.getElementById('userSection').style.display = 'flex';
-            
             const fullName = currentUser?.user_metadata?.full_name || 'Team Member';
             const role = currentUser?.user_metadata?.employee_type || 'employee';
             const initial = fullName.charAt(0).toUpperCase();
-            
             document.getElementById('userNameDisplay').textContent = fullName;
             document.getElementById('userRoleDisplay').textContent = role.toUpperCase();
             document.getElementById('userAvatarDisplay').textContent = initial;
-            
             document.getElementById('attendanceName').textContent = fullName;
             document.getElementById('attendanceAvatar').textContent = initial;
             document.getElementById('attendanceRole').textContent = role.toUpperCase();
-            
             loadStatus();
         }
 
         function setupEventListeners() {
-            // Remove old listeners to avoid duplicates
             const loginForm = document.getElementById('loginForm');
             if (loginForm && !loginForm.dataset.setup) {
                 loginForm.addEventListener('submit', handleLogin);
                 loginForm.dataset.setup = 'true';
             }
-            
             const eodForm = document.getElementById('eodForm');
             if (eodForm && !eodForm.dataset.setup) {
                 eodForm.addEventListener('submit', handleEodSubmit);
                 eodForm.dataset.setup = 'true';
             }
-            
             const clientForm = document.getElementById('clientForm');
             if (clientForm && !clientForm.dataset.setup) {
                 clientForm.addEventListener('submit', handleClientSubmit);
                 clientForm.dataset.setup = 'true';
             }
-            
             const registerForm = document.getElementById('registerForm');
             if (registerForm && !registerForm.dataset.setup) {
                 registerForm.addEventListener('submit', handleRegister);
                 registerForm.dataset.setup = 'true';
             }
-            
-            // Setup employee type toggle
             const regularOption = document.getElementById('typeRegularOption');
             const managerOption = document.getElementById('typeManagerOption');
-            
             if (regularOption && !regularOption.dataset.setup) {
                 regularOption.addEventListener('click', function() {
                     document.querySelector('input[name="regType"][value="regular"]').checked = true;
@@ -986,7 +855,6 @@
                 });
                 regularOption.dataset.setup = 'true';
             }
-            
             if (managerOption && !managerOption.dataset.setup) {
                 managerOption.addEventListener('click', function() {
                     document.querySelector('input[name="regType"][value="manager"]').checked = true;
@@ -1000,23 +868,250 @@
 
         async function handleLogin(e) {
             e.preventDefault();
-            
             if (!supabaseClient) {
                 showMessage('loginMessage', 'error', 'System initializing, please try again');
                 return;
             }
-            
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             const btn = document.getElementById('loginBtn');
             const btnText = document.getElementById('loginBtnText');
-            
             btn.disabled = true;
             btnText.innerHTML = '<span class="loading-dots"></span>Signing in...';
-            
             try {
                 const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
                 if (error) throw error;
-                
                 if (!data.user.email_confirmed_at) {
-                    showMessage
+                    showMessage('loginMessage', 'info', 'Please check your email to confirm your account.');
+                    btn.disabled = false;
+                    btnText.textContent = 'Sign In';
+                    return;
+                }
+                userSession = data.session;
+                localStorage.setItem('hcm_session', JSON.stringify(data.session));
+                currentUser = data.user;
+                showMessage('loginMessage', 'success', 'Welcome back, ' + (data.user.user_metadata?.full_name || 'Team Member') + '!');
+                setTimeout(function() { showAttendance(); }, 800);
+            } catch (error) {
+                showMessage('loginMessage', 'error', error.message.includes('Invalid') ? 'Invalid email or password' : error.message);
+                btn.disabled = false;
+                btnText.textContent = 'Sign In';
+            }
+        }
+
+        function logout() {
+            supabaseClient?.auth.signOut();
+            localStorage.removeItem('hcm_session');
+            currentUser = null;
+            userSession = null;
+            showLogin();
+            showMessage('loginMessage', 'info', 'You have been logged out.');
+        }
+
+        async function handleCheckin() {
+            const fullName = currentUser?.user_metadata?.full_name;
+            const now = new Date();
+            try {
+                const { data, error } = await supabaseClient.from('attendance_records').insert({
+                    name: fullName,
+                    check_in_time: now.toISOString(),
+                    date: now.toISOString().split('T')[0]
+                }).select().single();
+                if (error) throw error;
+                currentAttendanceId = data.id;
+                showMessage('attendanceMessage', 'success', 'Checked in at ' + now.toLocaleTimeString());
+                loadStatus();
+            } catch (error) {
+                showMessage('attendanceMessage', 'error', 'Check-in failed: ' + error.message);
+            }
+        }
+
+        async function handleCheckout() {
+            const now = new Date();
+            try {
+                const { data, error } = await supabaseClient.from('attendance_records').update({
+                    check_out_time: now.toISOString()
+                }).eq('id', currentAttendanceId).select().single();
+                if (error) throw error;
+                const role = currentUser?.user_metadata?.employee_type || 'employee';
+                if (role === 'manager') {
+                    showClientModal();
+                } else {
+                    showEodModal();
+                }
+                showMessage('attendanceMessage', 'success', 'Checked out at ' + now.toLocaleTimeString());
+                loadStatus();
+            } catch (error) {
+                showMessage('attendanceMessage', 'error', 'Check-out failed: ' + error.message);
+            }
+        }
+
+        async function loadStatus() {
+            try {
+                const { data, error } = await supabaseClient.from('attendance_records').select('name, check_in_time, check_out_time').order('check_in_time', { ascending: false }).limit(20);
+                if (error) throw error;
+                const statusList = document.getElementById('statusList');
+                if (!data || data.length === 0) {
+                    statusList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">No activity yet today</p>';
+                    return;
+                }
+                const today = new Date().toISOString().split('T')[0];
+                const todayData = data.filter(function(item) { return item.check_in_time.split('T')[0] === today; });
+                if (todayData.length === 0) {
+                    statusList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">No activity yet today</p>';
+                    return;
+                }
+                const uniqueNames = [...new Set(todayData.map(function(item) { return item.name; }))];
+                statusList.innerHTML = uniqueNames.map(function(name) {
+                    const userData = todayData.find(function(item) { return item.name === name; });
+                    const isActive = !userData.check_out_time;
+                    return '<div class="status-item"><span class="status-name">' + name + '</span><span class="status-badge ' + (isActive ? 'active' : '') + '">' + (isActive ? 'Active' : 'Completed') + '</span></div>';
+                }).join('');
+            } catch (error) {
+                console.log('Error loading status:', error);
+            }
+        }
+
+        function showMessage(elementId, type, text) {
+            const el = document.getElementById(elementId);
+            el.className = 'message show ' + type;
+            el.textContent = text;
+            setTimeout(function() { el.className = 'message'; }, 5000);
+        }
+
+        function showEodModal() {
+            document.getElementById('eodModal').classList.add('show');
+        }
+
+        function closeEodModal() {
+            document.getElementById('eodModal').classList.remove('show');
+        }
+
+        function showClientModal() {
+            clientCount = 0;
+            document.getElementById('clientBoxes').innerHTML = '';
+            addClientBox();
+            document.getElementById('clientModal').classList.add('show');
+        }
+
+        function closeClientModal() {
+            document.getElementById('clientModal').classList.remove('show');
+        }
+
+        function showRegisterModal() {
+            document.getElementById('registerModal').classList.add('show');
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').classList.remove('show');
+        }
+
+        function addClientBox() {
+            clientCount++;
+            const container = document.getElementById('clientBoxes');
+            const div = document.createElement('div');
+            div.className = 'form-group-modal';
+            div.innerHTML = '<label class="form-label">Client ' + clientCount + '</label><input type="text" class="form-input" id="clientName' + clientCount + '" placeholder="Client name"><textarea class="form-input" id="clientReport' + clientCount + '" placeholder="Report for this client..." style="margin-top: 8px;"></textarea>';
+            container.appendChild(div);
+        }
+
+        async function handleEodSubmit(e) {
+            e.preventDefault();
+            const accomplishments = document.getElementById('eodAccomplishments').value;
+            const revisionsDone = document.getElementById('eodRevisionsDone').value;
+            const newVideosCount = document.getElementById('eodNewVideosCount').value;
+            try {
+                const { error } = await supabaseClient.from('eod_reports').insert({
+                    name: currentUser?.user_metadata?.full_name,
+                    accomplishments: accomplishments,
+                    revisions_done: revisionsDone,
+                    new_videos_count: parseInt(newVideosCount),
+                    date: new Date().toISOString().split('T')[0]
+                });
+                if (error) throw error;
+                closeEodModal();
+                document.getElementById('eodForm').reset();
+                showMessage('attendanceMessage', 'success', 'EOD Report submitted!');
+            } catch (error) {
+                showMessage('attendanceMessage', 'error', 'Failed to submit EOD report: ' + error.message);
+            }
+        }
+
+        async function handleClientSubmit(e) {
+            e.preventDefault();
+            const reports = [];
+            for (let i = 1; i <= clientCount; i++) {
+                const clientName = document.getElementById('clientName' + i)?.value;
+                const clientReport = document.getElementById('clientReport' + i)?.value;
+                if (clientName && clientReport) {
+                    reports.push({ name: clientName, report: clientReport });
+                }
+            }
+            if (reports.length === 0) {
+                alert('Please add at least one client report');
+                return;
+            }
+            try {
+                for (const report of reports) {
+                    const { error } = await supabaseClient.from('client_reports').insert({
+                        client_name: report.name,
+                        report: report.report,
+                        date: new Date().toISOString().split('T')[0]
+                    });
+                    if (error) throw error;
+                }
+                closeClientModal();
+                document.getElementById('clientBoxes').innerHTML = '';
+                showMessage('attendanceMessage', 'success', 'Client reports submitted!');
+            } catch (error) {
+                showMessage('attendanceMessage', 'error', 'Failed to submit client reports: ' + error.message);
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const type = document.querySelector('input[name="regType"]:checked').value;
+            const btn = document.getElementById('registerBtn');
+            btn.disabled = true;
+            btn.textContent = 'Creating account...';
+            try {
+                if (type === 'manager') {
+                    const managerPass = document.getElementById('managerPassword').value;
+                    const role = document.getElementById('regRole').value;
+                    if (managerPass !== MANAGER_PASSWORD) {
+                        throw new Error('Invalid manager password');
+                    }
+                    if (!role) {
+                        throw new Error('Role/Title is required for managers');
+                    }
+                    const { error } = await supabaseClient.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: { data: { full_name: name, employee_type: 'manager', role: role } }
+                    });
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabaseClient.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: { data: { full_name: name, employee_type: 'regular' } }
+                    });
+                    if (error) throw error;
+                }
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('registerSuccess').style.display = 'block';
+            } catch (error) {
+                showMessage('loginMessage', 'error', error.message);
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
+        }
+
+        // START BOOT SEQUENCE
+        startBoot();
+    </script>
+</body>
+</html>
