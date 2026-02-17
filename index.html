@@ -913,9 +913,9 @@
             const now = new Date();
             try {
                 const { data, error } = await supabaseClient.from('attendance_records').insert({
-                    name: fullName,
+                    employee_name: fullName,
                     check_in_time: now.toISOString(),
-                    date: now.toISOString().split('T')[0]
+                    status: 'checked_in'
                 }).select().single();
                 if (error) throw error;
                 currentAttendanceId = data.id;
@@ -948,7 +948,7 @@
 
         async function loadStatus() {
             try {
-                const { data, error } = await supabaseClient.from('attendance_records').select('name, check_in_time, check_out_time').order('check_in_time', { ascending: false }).limit(20);
+                const { data, error } = await supabaseClient.from('attendance_records').select('employee_name, check_in_time, check_out_time').order('check_in_time', { ascending: false }).limit(20);
                 if (error) throw error;
                 const statusList = document.getElementById('statusList');
                 if (!data || data.length === 0) {
@@ -961,9 +961,9 @@
                     statusList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">No activity yet today</p>';
                     return;
                 }
-                const uniqueNames = [...new Set(todayData.map(function(item) { return item.name; }))];
+                const uniqueNames = [...new Set(todayData.map(function(item) { return item.employee_name; }))];
                 statusList.innerHTML = uniqueNames.map(function(name) {
-                    const userData = todayData.find(function(item) { return item.name === name; });
+                    const userData = todayData.find(function(item) { return item.employee_name === name; });
                     const isActive = !userData.check_out_time;
                     return '<div class="status-item"><span class="status-name">' + name + '</span><span class="status-badge ' + (isActive ? 'active' : '') + '">' + (isActive ? 'Active' : 'Completed') + '</span></div>';
                 }).join('');
@@ -1022,11 +1022,10 @@
             const newVideosCount = document.getElementById('eodNewVideosCount').value;
             try {
                 const { error } = await supabaseClient.from('eod_reports').insert({
-                    name: currentUser?.user_metadata?.full_name,
+                    employee_name: currentUser?.user_metadata?.full_name,
                     accomplishments: accomplishments,
                     revisions_done: revisionsDone,
-                    new_videos_count: parseInt(newVideosCount),
-                    date: new Date().toISOString().split('T')[0]
+                    new_videos_count: parseInt(newVideosCount)
                 });
                 if (error) throw error;
                 closeEodModal();
@@ -1054,9 +1053,10 @@
             try {
                 for (const report of reports) {
                     const { error } = await supabaseClient.from('client_reports').insert({
+                        attendance_id: currentAttendanceId,
+                        employee_name: currentUser?.user_metadata?.full_name,
                         client_name: report.name,
-                        report: report.report,
-                        date: new Date().toISOString().split('T')[0]
+                        report: report.report
                     });
                     if (error) throw error;
                 }
