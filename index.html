@@ -810,3 +810,44 @@
                     employee_name: currentUser.fullName,
                     videos_done: document.getElementById('eodAccomplishments').value,
                     revisions_done: document.getElementById('eodRevisionsDone').value,
+                    new_videos_count: parseInt(document.getElementById('eodNewVideosCount').value) || 0
+                });
+                closeEodModal();
+                document.getElementById('eodForm').reset();
+                showMessage('attendanceMessage', 'success', 'EOD Report submitted!');
+            } catch (error) {
+                showMessage('attendanceMessage', 'error', 'Failed: ' + error.message);
+            }
+        }
+
+        async function handleClientSubmit(e) {
+            e.preventDefault();
+            const reports = [];
+            for (let i = 1; i <= clientCount; i++) {
+                const cName = document.getElementById('clientName' + i)?.value;
+                const cReport = document.getElementById('clientReport' + i)?.value;
+                if (cName && cReport) reports.push({ name: cName, report: cReport });
+            }
+            if (reports.length === 0) return alert('Add at least one client');
+            
+            try {
+                for (const r of reports) {
+                    await supabase.from('client_reports').insert({
+                        employee_name: currentUser.fullName,
+                        client_name: r.name,
+                        report: r.report
+                    });
+                }
+                closeClientModal();
+                document.getElementById('clientBoxes').innerHTML = '';
+                showMessage('attendanceMessage', 'success', 'Client reports submitted!');
+            } catch (error) {
+                showMessage('attendanceMessage', 'error', 'Failed: ' + error.message);
+            }
+        }
+
+        // START BOOT
+        startBoot();
+    </script>
+</body>
+</html>
