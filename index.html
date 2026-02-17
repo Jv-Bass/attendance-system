@@ -20,7 +20,113 @@
             background: var(--hcm-bg);
             min-height: 100vh;
             color: #e2e8f0;
+            overflow-x: hidden;
         }
+        
+        /* HCM BOOT SCREEN */
+        #bootScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--hcm-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+        }
+        .boot-logo-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .boot-logo-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top-color: var(--hcm-primary);
+            border-radius: 50%;
+            animation: rotate 1.2s linear infinite;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+        }
+        .boot-logo-ring:nth-child(2) {
+            width: 85%;
+            height: 85%;
+            border-top-color: var(--hcm-secondary);
+            border-right-color: var(--hcm-secondary);
+            animation-direction: reverse;
+            animation-duration: 1.8s;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+        .boot-logo-ring:nth-child(3) {
+            width: 70%;
+            height: 70%;
+            border: 2px solid transparent;
+            border-bottom-color: var(--hcm-primary);
+            animation: rotate 2s linear infinite reverse;
+            opacity: 0.5;
+        }
+        .boot-logo-text {
+            font-size: 32px;
+            font-weight: 900;
+            color: white;
+            letter-spacing: 8px;
+            text-shadow: 0 0 30px rgba(37, 99, 235, 0.8), 0 0 60px rgba(37, 99, 235, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; text-shadow: 0 0 30px rgba(37, 99, 235, 0.6); }
+            50% { opacity: 1; text-shadow: 0 0 50px rgba(37, 99, 235, 1), 0 0 100px rgba(37, 99, 235, 0.6); }
+        }
+        .boot-loading {
+            margin-top: 40px;
+            display: flex;
+            gap: 10px;
+        }
+        .boot-loading span {
+            width: 12px;
+            height: 12px;
+            background: var(--hcm-primary);
+            border-radius: 50%;
+            animation: bootPulse 1.4s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+        }
+        .boot-loading span:nth-child(2) {
+            animation-delay: 0.2s;
+            background: var(--hcm-secondary);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+        .boot-loading span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bootPulse {
+            0%, 100% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        .boot-status {
+            margin-top: 30px;
+            font-size: 14px;
+            color: var(--hcm-primary);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        #appContainer { display: none; min-height: 100vh; }
+        
+        /* MAIN UI */
         .header-bar {
             background: linear-gradient(135deg, var(--hcm-panel), var(--hcm-bg));
             border-bottom: 1px solid var(--hcm-border);
@@ -29,41 +135,40 @@
             justify-content: space-between;
             align-items: center;
         }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .logo { display: flex; align-items: center; gap: 12px; }
         .logo-icon {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-secondary));
-            border-radius: 8px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
-            font-size: 14px;
+            font-weight: 900;
+            font-size: 16px;
             color: white;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
         }
-        .logo-text { font-size: 18px; font-weight: 700; color: white; }
+        .logo-text { font-size: 20px; font-weight: 800; color: white; letter-spacing: 2px; }
         .logo-text span { color: var(--hcm-secondary); }
+        
         .user-section { display: none; align-items: center; gap: 12px; }
         .user-avatar {
-            width: 36px;
-            height: 36px;
-            background: var(--hcm-primary);
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-secondary));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 16px;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
         }
         .user-info { text-align: right; }
-        .user-name { font-size: 14px; color: white; font-weight: 500; }
-        .user-role { font-size: 11px; color: var(--hcm-secondary); text-transform: uppercase; }
+        .user-name { font-size: 14px; color: white; font-weight: 600; }
+        .user-role { font-size: 11px; color: var(--hcm-secondary); text-transform: uppercase; letter-spacing: 1px; }
         .logout-btn {
             background: transparent;
             border: 1px solid var(--hcm-border);
@@ -72,124 +177,145 @@
             border-radius: 8px;
             font-size: 12px;
             cursor: pointer;
+            transition: all 0.3s;
         }
+        .logout-btn:hover { border-color: var(--hcm-primary); color: var(--hcm-primary); box-shadow: 0 0 15px rgba(37, 99, 235, 0.3); }
+        
         .main-header {
             background: linear-gradient(135deg, var(--hcm-panel) 0%, var(--hcm-bg) 100%);
-            padding: 32px 24px;
+            padding: 40px 24px;
             text-align: center;
             border-bottom: 1px solid var(--hcm-border);
         }
-        .main-header h1 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 4px; }
-        .main-header p { color: #94a3b8; font-size: 14px; }
+        .main-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px rgba(37, 99, 235, 0.5);
+            margin-bottom: 8px;
+        }
+        .main-header p { color: #94a3b8; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
         .time-display {
-            margin-top: 16px;
-            font-size: 48px;
+            margin-top: 24px;
+            font-size: 56px;
             font-family: 'Courier New', monospace;
             color: var(--hcm-primary);
             font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: 8px;
+            text-shadow: 0 0 30px rgba(37, 99, 235, 0.6);
         }
-        .date-display { font-size: 14px; color: #94a3b8; margin-top: 4px; }
-        .main-content { max-width: 500px; margin: 0 auto; padding: 24px; }
+        .date-display { font-size: 14px; color: #94a3b8; margin-top: 8px; letter-spacing: 2px; }
+        
+        .main-content { max-width: 550px; margin: 0 auto; padding: 24px; }
         .card {
             background: var(--hcm-panel);
             border: 1px solid var(--hcm-border);
             border-radius: 16px;
-            padding: 24px;
+            padding: 28px;
             margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
         }
         .card::before {
             content: '';
-            display: block;
-            height: 4px;
-            background: linear-gradient(90deg, var(--hcm-primary), var(--hcm-secondary));
-            border-radius: 16px 16px 0 0;
-            margin: -24px -24px 20px -24px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--hcm-primary), var(--hcm-secondary), var(--hcm-primary));
         }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .card-title { font-size: 16px; font-weight: 600; color: white; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .card-title { font-size: 18px; font-weight: 700; color: white; letter-spacing: 1px; }
         .card-icon {
-            width: 44px;
-            height: 44px;
-            background: rgba(37, 99, 235, 0.1);
+            width: 48px;
+            height: 48px;
+            background: rgba(37, 99, 235, 0.15);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .card-icon svg { width: 22px; height: 22px; fill: var(--hcm-primary); }
+        .card-icon svg { width: 24px; height: 24px; fill: var(--hcm-primary); }
+        
         .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 500; }
+        .form-label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 10px; font-weight: 500; letter-spacing: 1px; }
         .form-input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 16px 18px;
             background: var(--hcm-bg);
             border: 1px solid var(--hcm-border);
             border-radius: 10px;
             color: white;
             font-size: 15px;
+            transition: all 0.3s;
         }
-        .form-input:focus { outline: none; border-color: var(--hcm-primary); }
+        .form-input:focus { outline: none; border-color: var(--hcm-primary); box-shadow: 0 0 20px rgba(37, 99, 235, 0.2); }
+        
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             border: none;
             border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
         .btn-primary {
             background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-primary-dim));
             color: white;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
         }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37, 99, 235, 0.5); }
         .btn-secondary { background: transparent; border: 2px solid var(--hcm-border); color: #94a3b8; }
+        .btn-secondary:hover { border-color: var(--hcm-secondary); color: var(--hcm-secondary); }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .status-list { max-height: 300px; overflow-y: auto; }
+        
+        .status-list { max-height: 350px; overflow-y: auto; }
         .status-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 0;
+            padding: 16px 0;
             border-bottom: 1px solid var(--hcm-border);
         }
-        .status-name { font-size: 14px; color: white; }
+        .status-name { font-size: 15px; color: white; font-weight: 600; }
         .status-badge {
-            padding: 6px 14px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
         .status-badge.active {
-            background: rgba(34, 197, 94, 0.1);
+            background: rgba(34, 197, 94, 0.15);
             border: 1px solid #22c55e;
             color: #22c55e;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
         }
-        .message {
-            padding: 14px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 14px;
-            font-weight: 500;
-        }
+        
+        .message { padding: 16px; border-radius: 10px; margin-bottom: 20px; display: none; font-size: 14px; font-weight: 500; }
         .message.show { display: block; }
-        .message.success { background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; color: #22c55e; }
-        .message.error { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; }
-        .links { text-align: center; padding-top: 20px; border-top: 1px solid var(--hcm-border); }
-        .links a { color: #94a3b8; text-decoration: none; font-size: 13px; margin: 0 10px; }
+        .message.success { background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #22c55e; }
+        .message.error { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; }
+        
+        .links { text-align: center; padding-top: 24px; border-top: 1px solid var(--hcm-border); }
+        .links a { color: var(--hcm-primary); text-decoration: none; font-size: 13px; margin: 0 15px; letter-spacing: 1px; }
+        .links a:hover { text-shadow: 0 0 10px rgba(37, 99, 235, 0.5); }
+        
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -203,164 +329,193 @@
             border-radius: 20px;
             width: 100%;
             max-width: 500px;
+            position: relative;
         }
-        .modal-header {
-            padding: 24px 24px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--hcm-primary), var(--hcm-secondary), var(--hcm-primary));
         }
-        .modal-header h2 { font-size: 18px; font-weight: 600; color: white; }
+        .modal-header { padding: 24px 24px 16px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 18px; font-weight: 700; color: white; letter-spacing: 1px; }
         .modal-close {
             background: transparent;
             border: none;
             color: #94a3b8;
-            font-size: 28px;
+            font-size: 32px;
             cursor: pointer;
             line-height: 1;
         }
         .modal-body { padding: 0 24px 24px; }
-        .form-group-modal { margin-bottom: 20px; }
-        textarea.form-input { min-height: 100px; resize: vertical; }
-        .employee-type-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .employee-type-option {
-            background: var(--hcm-bg);
-            border: 2px solid var(--hcm-border);
-            border-radius: 12px;
-            padding: 16px;
-            cursor: pointer;
-            text-align: center;
-        }
-        .employee-type-option.selected { border-color: var(--hcm-primary); background: rgba(37, 99, 235, 0.05); }
-        .employee-type-option input { display: none; }
-        .employee-type-option .icon { font-size: 28px; margin-bottom: 8px; }
-        .employee-type-option .label { font-size: 14px; font-weight: 600; color: white; }
-        .employee-type-option .desc { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-        .welcome-badge {
-            background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-secondary));
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            color: white;
-            display: inline-block;
-        }
-        .user-greeting { display: flex; align-items: center; gap: 10px; }
         .submit-modal-btn {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-primary-dim));
             border: none;
             border-radius: 10px;
             color: white;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
+        textarea.form-input { min-height: 120px; resize: vertical; }
+        
+        .employee-type-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .employee-type-option {
+            background: var(--hcm-bg);
+            border: 2px solid var(--hcm-border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .employee-type-option:hover { border-color: var(--hcm-primary-dim); }
+        .employee-type-option.selected { border-color: var(--hcm-primary); background: rgba(37, 99, 235, 0.1); }
+        .employee-type-option input { display: none; }
+        .employee-type-option .icon { font-size: 32px; margin-bottom: 10px; }
+        .employee-type-option .label { font-size: 15px; font-weight: 700; color: white; }
+        .employee-type-option .desc { font-size: 11px; color: #94a3b8; margin-top: 5px; }
+        
+        .welcome-badge {
+            background: linear-gradient(135deg, var(--hcm-primary), var(--hcm-secondary));
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+        .user-greeting { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
     </style>
 </head>
 <body>
-    <div class="header-bar">
-        <div class="logo">
-            <div class="logo-icon">HCM</div>
-            <div class="logo-text">HIGH <span>CON</span></div>
+    <!-- HCM BOOT SCREEN -->
+    <div id="bootScreen">
+        <div class="boot-logo-container">
+            <div class="boot-logo-ring"></div>
+            <div class="boot-logo-ring"></div>
+            <div class="boot-logo-ring"></div>
+            <div class="boot-logo-text">HCM</div>
         </div>
-        <div class="user-section" id="userSection">
-            <div class="user-info">
-                <div class="user-name" id="userNameDisplay">-</div>
-                <div class="user-role" id="userRoleDisplay">-</div>
+        <div class="boot-loading">
+            <span></span><span></span><span></span>
+        </div>
+        <div class="boot-status">Initializing System</div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="appContainer">
+        <div class="header-bar">
+            <div class="logo">
+                <div class="logo-icon">HCM</div>
+                <div class="logo-text">HIGH <span>CON</span></div>
             </div>
-            <div class="user-avatar" id="userAvatarDisplay">?</div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+            <div class="user-section" id="userSection">
+                <div class="user-info">
+                    <div class="user-name" id="userNameDisplay">-</div>
+                    <div class="user-role" id="userRoleDisplay">-</div>
+                </div>
+                <div class="user-avatar" id="userAvatarDisplay">?</div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="main-header">
+            <h1>ATTENDANCE SYSTEM</h1>
+            <p>Track your daily presence</p>
+            <div class="time-display" id="currentTime">00:00:00</div>
+            <div class="date-display" id="currentDate">Loading...</div>
+        </div>
+
+        <div class="main-content" id="loginSection">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">WELCOME BACK</div>
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                    </div>
+                </div>
+                <div id="loginMessage" class="message"></div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">EMAIL ADDRESS</label>
+                        <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">PASSWORD</label>
+                        <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="loginBtn"><span id="loginBtnText">Sign In</span></button>
+                </form>
+                <div class="links">
+                    <a href="#" onclick="showRegisterModal(); return false;">New Team Member? Register Here</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content" id="attendanceSection" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">QUICK ACTIONS</div>
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2z"/></svg>
+                    </div>
+                </div>
+                <div id="attendanceMessage" class="message"></div>
+                <div class="user-greeting">
+                    <div class="user-avatar" id="attendanceAvatar" style="width: 56px; height: 56px; font-size: 22px;">?</div>
+                    <div>
+                        <span class="welcome-badge" id="attendanceRole">EMPLOYEE</span>
+                        <div style="font-size: 20px; font-weight: 700; color: white;" id="attendanceName">-</div>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="handleCheckin()">Check In</button>
+                    <button class="btn btn-secondary" onclick="handleCheckout()">Check Out</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">TEAM ACTIVITY</div>
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3z"/></svg>
+                    </div>
+                </div>
+                <div class="status-list" id="statusList">
+                    <p style="color: #94a3b8; text-align: center; padding: 30px;">Loading activity...</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="main-header">
-        <h1>Attendance System</h1>
-        <p>Track your daily presence</p>
-        <div class="time-display" id="currentTime">00:00:00</div>
-        <div class="date-display" id="currentDate">Loading...</div>
-    </div>
-
-    <div class="main-content" id="loginSection">
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Welcome Back</div>
-                <div class="card-icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-                </div>
-            </div>
-            <div id="loginMessage" class="message"></div>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
-                </div>
-                <button type="submit" class="btn btn-primary" id="loginBtn"><span id="loginBtnText">Sign In</span></button>
-            </form>
-            <div class="links">
-                <a href="#" onclick="showRegisterModal(); return false;">New Team Member? Register Here</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="main-content" id="attendanceSection" style="display:none;">
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Quick Actions</div>
-                <div class="card-icon">
-                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2z"/></svg>
-                </div>
-            </div>
-            <div id="attendanceMessage" class="message"></div>
-            <div class="user-greeting" style="margin-bottom: 20px;">
-                <div class="user-avatar" id="attendanceAvatar" style="width: 48px; height: 48px; font-size: 18px;">?</div>
-                <div>
-                    <span class="welcome-badge" id="attendanceRole">EMPLOYEE</span>
-                    <div style="font-size: 18px; font-weight: 600; color: white;" id="attendanceName">-</div>
-                </div>
-            </div>
-            <div class="btn-group">
-                <button class="btn btn-primary" onclick="handleCheckin()">Check In</button>
-                <button class="btn btn-secondary" onclick="handleCheckout()">Check Out</button>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Team Activity</div>
-                <div class="card-icon">
-                    <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3z"/></svg>
-                </div>
-            </div>
-            <div class="status-list" id="statusList">
-                <p style="color: #94a3b8; text-align: center; padding: 20px;">Loading...</p>
-            </div>
-        </div>
-    </div>
-
+    <!-- MODALS -->
     <div class="modal-overlay" id="eodModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>End of Day Report</h2>
+                <h2>END OF DAY REPORT</h2>
                 <button class="modal-close" onclick="closeEodModal()">×</button>
             </div>
             <div class="modal-body">
                 <form id="eodForm">
-                    <div class="form-group-modal">
-                        <label class="form-label">What did you accomplish today?</label>
+                    <div class="form-group">
+                        <label class="form-label">WHAT DID YOU ACCOMPLISH?</label>
                         <textarea class="form-input" id="eodAccomplishments" required placeholder="List your accomplishments..."></textarea>
                     </div>
-                    <div class="form-group-modal">
-                        <label class="form-label">Revisions completed</label>
+                    <div class="form-group">
+                        <label class="form-label">REVISIONS COMPLETED</label>
                         <textarea class="form-input" id="eodRevisionsDone" required placeholder="List revisions..."></textarea>
                     </div>
-                    <div class="form-group-modal">
-                        <label class="form-label">New videos edited</label>
+                    <div class="form-group">
+                        <label class="form-label">NEW VIDEOS EDITED</label>
                         <input type="number" class="form-input" id="eodNewVideosCount" required min="0" placeholder="0">
                     </div>
                     <button type="submit" class="submit-modal-btn">Submit Report</button>
@@ -372,7 +527,7 @@
     <div class="modal-overlay" id="clientModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>Client Reports</h2>
+                <h2>CLIENT REPORTS</h2>
                 <button class="modal-close" onclick="closeClientModal()">×</button>
             </div>
             <div class="modal-body">
@@ -388,25 +543,25 @@
     <div class="modal-overlay" id="registerModal">
         <div class="modal">
             <div class="modal-header">
-                <h2>Join the Team</h2>
+                <h2>JOIN THE TEAM</h2>
                 <button class="modal-close" onclick="closeRegisterModal()">×</button>
             </div>
             <div class="modal-body">
                 <form id="registerForm">
-                    <div class="form-group-modal">
-                        <label class="form-label">Full Name *</label>
+                    <div class="form-group">
+                        <label class="form-label">FULL NAME *</label>
                         <input type="text" class="form-input" id="regName" required placeholder="Enter your full name">
                     </div>
-                    <div class="form-group-modal">
-                        <label class="form-label">Email Address *</label>
+                    <div class="form-group">
+                        <label class="form-label">EMAIL ADDRESS *</label>
                         <input type="email" class="form-input" id="regEmail" required placeholder="your@email.com">
                     </div>
-                    <div class="form-group-modal">
-                        <label class="form-label">Password *</label>
+                    <div class="form-group">
+                        <label class="form-label">PASSWORD *</label>
                         <input type="password" class="form-input" id="regPassword" required placeholder="Min 6 characters" minlength="6">
                     </div>
-                    <div class="form-group-modal">
-                        <label class="form-label">Your Role *</label>
+                    <div class="form-group">
+                        <label class="form-label">YOUR ROLE *</label>
                         <div class="employee-type-group">
                             <label class="employee-type-option selected" id="typeRegularOption">
                                 <input type="radio" name="regType" value="regular" checked>
@@ -438,30 +593,53 @@
         let clientCount = 0;
         let supabase = null;
 
-        // Update time
-        function updateTime() {
-            const now = new Date();
-            const timeEl = document.getElementById('currentTime');
-            const dateEl = document.getElementById('currentDate');
-            if (timeEl) timeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        // BOOT SEQUENCE
+        function startBoot() {
+            console.log('HCM System booting...');
+            
+            // Show boot for 2.5 seconds then transition
+            setTimeout(function() {
+                var bootScreen = document.getElementById('bootScreen');
+                bootScreen.style.transition = 'opacity 0.8s ease';
+                bootScreen.style.opacity = '0';
+                
+                setTimeout(function() {
+                    bootScreen.style.display = 'none';
+                    document.getElementById('appContainer').style.display = 'block';
+                    initSupabase();
+                }, 800);
+            }, 2500);
+            
+            // Start clock immediately
+            updateTime();
+            setInterval(updateTime, 1000);
         }
-        updateTime();
-        setInterval(updateTime, 1000);
 
-        // Initialize Supabase
-        function init() {
+        function updateTime() {
+            var now = new Date();
+            var timeEl = document.getElementById('currentTime');
+            var dateEl = document.getElementById('currentDate');
+            if (timeEl) {
+                timeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+            if (dateEl) {
+                dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            }
+        }
+
+        function initSupabase() {
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SERVICE_KEY);
                 checkSession();
             } catch(e) {
+                console.log('Supabase init error:', e);
                 showLogin();
+                setupEventListeners();
             }
-            setupEventListeners();
         }
 
-        async function checkSession() {
-            const saved = localStorage.getItem('hcm_user');
+        function checkSession() {
+            var saved = localStorage.getItem('hcm_user');
             if (saved) {
                 try {
                     currentUser = JSON.parse(saved);
@@ -470,6 +648,7 @@
                 } catch(e) {}
             }
             showLogin();
+            setupEventListeners();
         }
 
         function showLogin() {
@@ -483,9 +662,9 @@
             document.getElementById('attendanceSection').style.display = 'block';
             document.getElementById('userSection').style.display = 'flex';
             
-            const fullName = currentUser?.fullName || 'Team Member';
-            const role = currentUser?.type || 'employee';
-            const initial = fullName.charAt(0).toUpperCase();
+            var fullName = currentUser?.fullName || 'Team Member';
+            var role = currentUser?.type || 'employee';
+            var initial = fullName.charAt(0).toUpperCase();
             
             document.getElementById('userNameDisplay').textContent = fullName;
             document.getElementById('userRoleDisplay').textContent = role.toUpperCase();
@@ -498,72 +677,90 @@
         }
 
         function setupEventListeners() {
-            document.getElementById('loginForm').addEventListener('submit', handleLogin);
-            document.getElementById('eodForm').addEventListener('submit', handleEodSubmit);
-            document.getElementById('clientForm').addEventListener('submit', handleClientSubmit);
-            document.getElementById('registerForm').addEventListener('submit', handleRegister);
-            
-            document.getElementById('typeRegularOption').addEventListener('click', function() {
-                document.querySelector('input[name="regType"][value="regular"]').checked = true;
-                this.classList.add('selected');
-                document.getElementById('typeManagerOption').classList.remove('selected');
-            });
-            
-            document.getElementById('typeManagerOption').addEventListener('click', function() {
-                document.querySelector('input[name="regType"][value="manager"]').checked = true;
-                this.classList.add('selected');
-                document.getElementById('typeRegularOption').classList.remove('selected');
-            });
+            var loginForm = document.getElementById('loginForm');
+            if (loginForm && !loginForm.dataset.setup) {
+                loginForm.addEventListener('submit', handleLogin);
+                loginForm.dataset.setup = 'true';
+            }
+            var eodForm = document.getElementById('eodForm');
+            if (eodForm && !eodForm.dataset.setup) {
+                eodForm.addEventListener('submit', handleEodSubmit);
+                eodForm.dataset.setup = 'true';
+            }
+            var clientForm = document.getElementById('clientForm');
+            if (clientForm && !clientForm.dataset.setup) {
+                clientForm.addEventListener('submit', handleClientSubmit);
+                clientForm.dataset.setup = 'true';
+            }
+            var registerForm = document.getElementById('registerForm');
+            if (registerForm && !registerForm.dataset.setup) {
+                registerForm.addEventListener('submit', handleRegister);
+                registerForm.dataset.setup = 'true';
+            }
+            var regularOption = document.getElementById('typeRegularOption');
+            var managerOption = document.getElementById('typeManagerOption');
+            if (regularOption && !regularOption.dataset.setup) {
+                regularOption.addEventListener('click', function() {
+                    document.querySelector('input[name="regType"][value="regular"]').checked = true;
+                    this.classList.add('selected');
+                    managerOption.classList.remove('selected');
+                });
+                regularOption.dataset.setup = 'true';
+            }
+            if (managerOption && !managerOption.dataset.setup) {
+                managerOption.addEventListener('click', function() {
+                    document.querySelector('input[name="regType"][value="manager"]').checked = true;
+                    this.classList.add('selected');
+                    regularOption.classList.remove('selected');
+                });
+                managerOption.dataset.setup = 'true';
+            }
         }
 
         async function handleLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            document.getElementById('loginBtn').disabled = true;
-            document.getElementById('loginBtnText').textContent = 'Signing in...';
+            var email = document.getElementById('loginEmail').value;
+            var password = document.getElementById('loginPassword').value;
+            var btn = document.getElementById('loginBtn');
+            var btnText = document.getElementById('loginBtnText');
+            btn.disabled = true;
+            btnText.textContent = 'Signing in...';
             
             try {
-                const { data: empData, error: empError } = await supabase.from('employees').select('*').eq('email', email).single();
+                var result = await supabase.from('employees').select('*').eq('email', email).single();
                 
-                if (empError || empData.password !== password) {
+                if (result.error || result.data.password !== password) {
                     throw new Error('Invalid email or password');
                 }
                 
-                currentUser = { id: empData.id, email: empData.email, fullName: empData.name, type: empData.type };
+                currentUser = { id: result.data.id, email: result.data.email, fullName: result.data.name, type: result.data.type };
                 localStorage.setItem('hcm_user', JSON.stringify(currentUser));
                 showAttendance();
-                showMessage('loginMessage', 'success', 'Welcome back, ' + empData.name + '!');
+                showMessage('loginMessage', 'success', 'Welcome back, ' + result.data.name + '!');
                 
-            } catch (error) {
+            } catch(error) {
                 showMessage('loginMessage', 'error', error.message);
-                document.getElementById('loginBtn').disabled = false;
-                document.getElementById('loginBtnText').textContent = 'Sign In';
+                btn.disabled = false;
+                btnText.textContent = 'Sign In';
             }
         }
 
         async function handleRegister(e) {
             e.preventDefault();
-            const name = document.getElementById('regName').value;
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const type = document.querySelector('input[name="regType"]:checked').value;
-            
-            document.getElementById('registerBtn').disabled = true;
-            document.getElementById('registerBtn').textContent = 'Creating...';
+            var name = document.getElementById('regName').value;
+            var email = document.getElementById('regEmail').value;
+            var password = document.getElementById('regPassword').value;
+            var type = document.querySelector('input[name="regType"]:checked').value;
+            var btn = document.getElementById('registerBtn');
+            btn.disabled = true;
+            btn.textContent = 'Creating...';
             
             try {
-                const { error } = await supabase.from('employees').insert({
-                    name: name,
-                    email: email,
-                    password: password,
-                    type: type
-                });
+                var result = await supabase.from('employees').insert({ name: name, email: email, password: password, type: type });
                 
-                if (error) throw error;
+                if (result.error) throw result.error;
                 
-                currentUser = { id: 'new-' + Date.now(), email, fullName: name, type };
+                currentUser = { id: 'new-' + Date.now(), email: email, fullName: name, type: type };
                 localStorage.setItem('hcm_user', JSON.stringify(currentUser));
                 
                 closeRegisterModal();
@@ -571,10 +768,10 @@
                 showAttendance();
                 showMessage('attendanceMessage', 'success', 'Welcome, ' + name + '!');
                 
-            } catch (error) {
+            } catch(error) {
                 showMessage('loginMessage', 'error', 'Registration failed: ' + error.message);
-                document.getElementById('registerBtn').disabled = false;
-                document.getElementById('registerBtn').textContent = 'Create Account';
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
             }
         }
 
@@ -588,151 +785,4 @@
 
         async function handleCheckin() {
             if (!currentUser) return showMessage('attendanceMessage', 'error', 'Please login first');
-            const now = new Date();
-            
-            try {
-                const { data, error } = await supabase.from('attendance_records').insert({
-                    employee_name: currentUser.fullName,
-                    check_in_time: now.toISOString(),
-                    status: 'checked_in'
-                }).select().single();
-                
-                if (error) throw error;
-                currentAttendanceId = data.id;
-                showMessage('attendanceMessage', 'success', 'Checked in at ' + now.toLocaleTimeString());
-                loadStatus();
-                
-            } catch (error) {
-                console.error('Check-in error:', error);
-                showMessage('attendanceMessage', 'error', 'Check-in failed: ' + error.message);
-            }
-        }
-
-        async function handleCheckout() {
-            if (!currentAttendanceId) return showMessage('attendanceMessage', 'error', 'Not checked in');
-            const now = new Date();
-            
-            try {
-                const { error } = await supabase.from('attendance_records').update({
-                    check_out_time: now.toISOString()
-                }).eq('id', currentAttendanceId);
-                
-                if (error) throw error;
-                
-                if (currentUser?.type === 'manager') showClientModal();
-                else showEodModal();
-                
-                showMessage('attendanceMessage', 'success', 'Checked out at ' + now.toLocaleTimeString());
-                currentAttendanceId = null;
-                loadStatus();
-                
-            } catch (error) {
-                showMessage('attendanceMessage', 'error', 'Check-out failed: ' + error.message);
-            }
-        }
-
-        async function loadStatus() {
-            try {
-                const { data, error } = await supabase.from('attendance_records')
-                    .select('employee_name, check_in_time, check_out_time')
-                    .order('check_in_time', { ascending: false })
-                    .limit(20);
-                
-                if (error) throw error;
-                
-                const statusList = document.getElementById('statusList');
-                if (!data || data.length === 0) {
-                    statusList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">No activity yet</p>';
-                    return;
-                }
-                
-                const today = new Date().toISOString().split('T')[0];
-                const todayData = data.filter(item => item.check_in_time.split('T')[0] === today);
-                const uniqueNames = [...new Set(todayData.map(item => item.employee_name))];
-                
-                statusList.innerHTML = uniqueNames.map(name => {
-                    const userData = todayData.find(item => item.employee_name === name);
-                    const isActive = !userData.check_out_time;
-                    return '<div class="status-item"><span class="status-name">' + name + '</span><span class="status-badge ' + (isActive ? 'active' : '') + '">' + (isActive ? 'Active' : 'Completed') + '</span></div>';
-                }).join('');
-                
-            } catch (error) {
-                console.error('Load status error:', error);
-            }
-        }
-
-        function showMessage(elementId, type, text) {
-            const el = document.getElementById(elementId);
-            el.className = 'message show ' + type;
-            el.textContent = text;
-            setTimeout(() => el.className = 'message', 5000);
-        }
-
-        function showEodModal() { document.getElementById('eodModal').classList.add('show'); }
-        function closeEodModal() { document.getElementById('eodModal').classList.remove('show'); }
-        function showClientModal() {
-            clientCount = 0;
-            document.getElementById('clientBoxes').innerHTML = '';
-            addClientBox();
-            document.getElementById('clientModal').classList.add('show');
-        }
-        function closeClientModal() { document.getElementById('clientModal').classList.remove('show'); }
-        function showRegisterModal() { document.getElementById('registerModal').classList.add('show'); }
-        function closeRegisterModal() { document.getElementById('registerModal').classList.remove('show'); }
-
-        function addClientBox() {
-            clientCount++;
-            const div = document.createElement('div');
-            div.className = 'form-group-modal';
-            div.innerHTML = '<label class="form-label">Client ' + clientCount + '</label><input type="text" class="form-input" id="clientName' + clientCount + '" placeholder="Client name"><textarea class="form-input" id="clientReport' + clientCount + '" placeholder="Report..." style="margin-top: 8px;"></textarea>';
-            document.getElementById('clientBoxes').appendChild(div);
-        }
-
-        async function handleEodSubmit(e) {
-            e.preventDefault();
-            try {
-                await supabase.from('eod_reports').insert({
-                    employee_name: currentUser.fullName,
-                    videos_done: document.getElementById('eodAccomplishments').value,
-                    revisions_done: document.getElementById('eodRevisionsDone').value,
-                    new_videos_count: parseInt(document.getElementById('eodNewVideosCount').value) || 0
-                });
-                closeEodModal();
-                document.getElementById('eodForm').reset();
-                showMessage('attendanceMessage', 'success', 'EOD Report submitted!');
-            } catch (error) {
-                showMessage('attendanceMessage', 'error', 'Failed: ' + error.message);
-            }
-        }
-
-        async function handleClientSubmit(e) {
-            e.preventDefault();
-            const reports = [];
-            for (let i = 1; i <= clientCount; i++) {
-                const cName = document.getElementById('clientName' + i)?.value;
-                const cReport = document.getElementById('clientReport' + i)?.value;
-                if (cName && cReport) reports.push({ name: cName, report: cReport });
-            }
-            if (reports.length === 0) return alert('Add at least one client');
-            
-            try {
-                for (const r of reports) {
-                    await supabase.from('client_reports').insert({
-                        employee_name: currentUser.fullName,
-                        client_name: r.name,
-                        report: r.report
-                    });
-                }
-                closeClientModal();
-                document.getElementById('clientBoxes').innerHTML = '';
-                showMessage('attendanceMessage', 'success', 'Client reports submitted!');
-            } catch (error) {
-                showMessage('attendanceMessage', 'error', 'Failed: ' + error.message);
-            }
-        }
-
-        // Start
-        init();
-    </script>
-</body>
-</html>
+            var now = new
