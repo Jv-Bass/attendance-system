@@ -788,7 +788,11 @@
             if (savedSession) {
                 try {
                     userSession = JSON.parse(savedSession);
-                    supabaseClient.auth.getUser(userSession.access_token).then(function(result) {
+                    // Set the session on the Supabase client
+                    supabaseClient.auth.setSession({
+                        access_token: userSession.access_token,
+                        refresh_token: userSession.refresh_token
+                    }).then(function(result) {
                         if (result.data && result.data.user) {
                             currentUser = result.data.user;
                             showAttendance();
