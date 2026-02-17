@@ -919,6 +919,10 @@
 
         async function handleCheckin() {
             const fullName = currentUser?.user_metadata?.full_name;
+            if (!fullName) {
+                showMessage('attendanceMessage', 'error', 'Please login first');
+                return;
+            }
             const now = new Date();
             try {
                 const { data, error } = await supabaseClient.from('attendance_records').insert({
@@ -926,22 +930,35 @@
                     check_in_time: now.toISOString(),
                     status: 'checked_in'
                 }).select().single();
-                if (error) throw error;
+                if (error) {
+                    console.error('Check-in error:', error);
+                    showMessage('attendanceMessage', 'error', 'Check-in failed: ' + error.message);
+                    return;
+                }
                 currentAttendanceId = data.id;
                 showMessage('attendanceMessage', 'success', 'Checked in at ' + now.toLocaleTimeString());
                 loadStatus();
             } catch (error) {
+                console.error('Check-in exception:', error);
                 showMessage('attendanceMessage', 'error', 'Check-in failed: ' + error.message);
             }
         }
 
         async function handleCheckout() {
+            if (!currentAttendanceId) {
+                showMessage('attendanceMessage', 'error', 'You are not checked in');
+                return;
+            }
             const now = new Date();
             try {
                 const { data, error } = await supabaseClient.from('attendance_records').update({
                     check_out_time: now.toISOString()
                 }).eq('id', currentAttendanceId).select().single();
-                if (error) throw error;
+                if (error) {
+                    console.error('Checkout error:', error);
+                    showMessage('attendanceMessage', 'error', 'Check-out failed: ' + error.message);
+                    return;
+                }
                 const role = currentUser?.user_metadata?.employee_type || 'employee';
                 if (role === 'manager') {
                     showClientModal();
@@ -951,6 +968,7 @@
                 showMessage('attendanceMessage', 'success', 'Checked out at ' + now.toLocaleTimeString());
                 loadStatus();
             } catch (error) {
+                console.error('Checkout exception:', error);
                 showMessage('attendanceMessage', 'error', 'Check-out failed: ' + error.message);
             }
         }
@@ -1087,31 +1105,47 @@
             btn.disabled = true;
             btn.textContent = 'Creating account...';
             try {
-                if (type === 'manager') {
-                    const managerPass = document.getElementById('managerPassword').value;
-                    const role = document.getElementById('regRole').value;
-                    if (managerPass !== MANAGER_PASSWORD) {
-                        throw new Error('Invalid manager password');
+                // First sign up
+                const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: { 
+                        data: { 
+                            full_name: name, 
+                            employee_type: type 
+                        }
                     }
-                    if (!role) {
-                        throw new Error('Role/Title is required for managers');
-                    }
-                    const { error } = await supabaseClient.auth.signUp({
-                        email: email,
-                        password: password,
-                        options: { data: { full_name: name, employee_type: 'manager', role: role } }
-                    });
-                    if (error) throw error;
-                } else {
-                    const { error } = await supabaseClient.auth.signUp({
-                        email: email,
-                        password: password,
-                        options: { data: { full_name: name, employee_type: 'regular' } }
-                    });
-                    if (error) throw error;
+                });
+                if (signUpError) throw signUpError;
+                
+                // Try to sign in immediately (auto-confirm flow)
+                const { data: signInData, error: signInError } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (signInError) {
+                    // Email confirmation required - show success message
+                    document.getElementById('registerForm').style.display = 'none';
+                    document.getElementById('registerSuccess').style.display = 'block';
+                    return;
                 }
-                document.getElementById('registerForm').style.display = 'none';
-                document.getElementById('registerSuccess').style.display = 'block';
+                
+                // Auto sign-in successful!
+                await supabaseClient.auth.setSession({
+                    access_token: signInData.session.access_token,
+                    refresh_token: signInData.session.refresh_token
+                });
+                userSession = signInData.session;
+                localStorage.setItem('hcm_session', JSON.stringify(signInData.session));
+                currentUser = signInData.user;
+                
+                // Hide modal and show attendance
+                closeRegisterModal();
+                document.getElementById('registerForm').reset();
+                showAttendance();
+                showMessage('attendanceMessage', 'success', 'Welcome, ' + (currentUser.user_metadata?.full_name || name) + '!');
+                
             } catch (error) {
                 showMessage('loginMessage', 'error', error.message);
                 btn.disabled = false;
