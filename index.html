@@ -296,7 +296,7 @@
         .message.error { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; }
         
         .links { text-align: center; padding-top: 24px; border-top: 1px solid var(--hcm-border); }
-        .links a { color: var(--hcm-primary); text-decoration: none; font-size: 13px; margin: 0 15px; letter-spacing: 1px; }
+        .links a { color: var(--hcm-primary); text-decoration: none; font-size: 13px; margin: 0 15px; letter-spacing: 1px; cursor: pointer; }
         .links a:hover { text-shadow: 0 0 10px rgba(37, 99, 235, 0.5); }
         
         .modal-overlay {
@@ -369,7 +369,6 @@
         }
         .employee-type-option:hover { border-color: var(--hcm-primary-dim); }
         .employee-type-option.selected { border-color: var(--hcm-primary); background: rgba(37, 99, 235, 0.1); }
-        .employee-type-option input { display: none; }
         .employee-type-option .icon { font-size: 32px; margin-bottom: 10px; }
         .employee-type-option .label { font-size: 15px; font-weight: 700; color: white; }
         .employee-type-option .desc { font-size: 11px; color: #94a3b8; margin-top: 5px; }
@@ -435,19 +434,17 @@
                     </div>
                 </div>
                 <div id="loginMessage" class="message"></div>
-                <form id="loginForm" onsubmit="event.preventDefault(); handleLogin(event);">
-                    <div class="form-group">
-                        <label class="form-label">EMAIL ADDRESS</label>
-                        <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">PASSWORD</label>
-                        <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
-                    </div>
-                    <button type="button" class="btn btn-primary" id="loginBtn" onclick="handleLogin(event)"><span id="loginBtnText">Sign In</span></button>
-                </form>
+                <div class="form-group">
+                    <label class="form-label">EMAIL ADDRESS</label>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">PASSWORD</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">Sign In</button>
                 <div class="links">
-                    <a href="#" onclick="showRegisterModal(); return false;">New Team Member? Register Here</a>
+                    <a onclick="showRegisterModal()">New Team Member? Register Here</a>
                 </div>
             </div>
         </div>
@@ -469,8 +466,8 @@
                     </div>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-primary" onclick="handleCheckin()">Check In</button>
-                    <button class="btn btn-secondary" onclick="handleCheckout()">Check Out</button>
+                    <button class="btn btn-primary" onclick="doCheckin()">Check In</button>
+                    <button class="btn btn-secondary" onclick="doCheckout()">Check Out</button>
                 </div>
             </div>
 
@@ -496,21 +493,19 @@
                 <button class="modal-close" onclick="closeEodModal()">×</button>
             </div>
             <div class="modal-body">
-                <form id="eodForm" onsubmit="event.preventDefault(); handleEodSubmit(event);">
-                    <div class="form-group">
-                        <label class="form-label">WHAT DID YOU ACCOMPLISH?</label>
-                        <textarea class="form-input" id="eodAccomplishments" required placeholder="List your accomplishments..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">REVISIONS COMPLETED</label>
-                        <textarea class="form-input" id="eodRevisionsDone" required placeholder="List revisions..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">NEW VIDEOS EDITED</label>
-                        <input type="number" class="form-input" id="eodNewVideosCount" required min="0" placeholder="0">
-                    </div>
-                    <button type="submit" class="submit-modal-btn">Submit Report</button>
-                </form>
+                <div class="form-group">
+                    <label class="form-label">WHAT DID YOU ACCOMPLISH?</label>
+                    <textarea class="form-input" id="eodAccomplishments" placeholder="List your accomplishments..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">REVISIONS COMPLETED</label>
+                    <textarea class="form-input" id="eodRevisionsDone" placeholder="List revisions..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">NEW VIDEOS EDITED</label>
+                    <input type="number" class="form-input" id="eodNewVideosCount" placeholder="0">
+                </div>
+                <button class="submit-modal-btn" onclick="submitEod()">Submit Report</button>
             </div>
         </div>
     </div>
@@ -522,11 +517,9 @@
                 <button class="modal-close" onclick="closeClientModal()">×</button>
             </div>
             <div class="modal-body">
-                <form id="clientForm" onsubmit="event.preventDefault(); handleClientSubmit(event);">
-                    <div id="clientBoxes"></div>
-                    <button type="button" class="submit-modal-btn" style="background: var(--hcm-panel); border: 1px solid var(--hcm-border); color: #94a3b8; margin-bottom: 12px;" onclick="addClientBox()">+ Add Client</button>
-                    <button type="submit" class="submit-modal-btn">Submit Reports</button>
-                </form>
+                <div id="clientBoxes"></div>
+                <button class="submit-modal-btn" style="background: var(--hcm-panel); border: 1px solid var(--hcm-border); color: #94a3b8; margin-bottom: 12px;" onclick="addClientBox()">+ Add Client</button>
+                <button class="submit-modal-btn" onclick="submitClientReports()">Submit Reports</button>
             </div>
         </div>
     </div>
@@ -538,57 +531,64 @@
                 <button class="modal-close" onclick="closeRegisterModal()">×</button>
             </div>
             <div class="modal-body">
-                <form id="registerForm" onsubmit="event.preventDefault(); handleRegister(event);">
-                    <div class="form-group">
-                        <label class="form-label">FULL NAME *</label>
-                        <input type="text" class="form-input" id="regName" required placeholder="Enter your full name">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">EMAIL ADDRESS *</label>
-                        <input type="email" class="form-input" id="regEmail" required placeholder="your@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">PASSWORD *</label>
-                        <input type="password" class="form-input" id="regPassword" required placeholder="Min 6 characters" minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">YOUR ROLE *</label>
-                        <div class="employee-type-group">
-                            <label class="employee-type-option selected" id="typeRegularOption">
-                                <input type="radio" name="regType" value="regular" checked>
-                                <div class="icon">🎬</div>
-                                <div class="label">Editor</div>
-                                <div class="desc">EOD Reports</div>
-                            </label>
-                            <label class="employee-type-option" id="typeManagerOption">
-                                <input type="radio" name="regType" value="manager">
-                                <div class="icon">👔</div>
-                                <div class="label">Manager</div>
-                                <div class="desc">Client Reports</div>
-                            </label>
+                <div class="form-group">
+                    <label class="form-label">FULL NAME *</label>
+                    <input type="text" class="form-input" id="regName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">EMAIL ADDRESS *</label>
+                    <input type="email" class="form-input" id="regEmail" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">PASSWORD *</label>
+                    <input type="password" class="form-input" id="regPassword" placeholder="Min 6 characters">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">YOUR ROLE *</label>
+                    <div class="employee-type-group">
+                        <div class="employee-type-option selected" id="typeRegularOption" onclick="selectRole('regular')">
+                            <div class="icon">🎬</div>
+                            <div class="label">Editor</div>
+                            <div class="desc">EOD Reports</div>
+                        </div>
+                        <div class="employee-type-option" id="typeManagerOption" onclick="selectRole('manager')">
+                            <div class="icon">👔</div>
+                            <div class="label">Manager</div>
+                            <div class="desc">Client Reports</div>
                         </div>
                     </div>
-                    <button type="submit" class="submit-modal-btn" id="registerBtn">Create Account</button>
-                </form>
+                </div>
+                <button class="submit-modal-btn" id="registerBtn" onclick="doRegister()">Create Account</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Service role key - bypasses RLS
+        // Configuration
         var SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bm5wdmVweXl1dHJ4c25oemt1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMTE0OTg0MywiZXhwIjoyMDg2NzI1ODQzfQ.THXsMBNZ496G6Vj8GA7q5uEUpjE8WM994sA_K8VhLfQ';
         var SUPABASE_URL = 'https://uwnnpvepyyutrxsnhzku.supabase.co';
 
+        // Global variables
         var currentUser = null;
         var currentAttendanceId = null;
         var clientCount = 0;
         var supabase = null;
+        var selectedRegType = 'regular';
 
-        // BOOT SEQUENCE
-        (function() {
+        // Initialize Supabase
+        function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SERVICE_KEY);
+            } catch(e) {
+                console.log('Supabase init error:', e);
+            }
+        }
+
+        // Boot sequence
+        function startBoot() {
             console.log('HCM System booting...');
+            initSupabase();
             
-            // Show boot for 2.5 seconds then transition
             setTimeout(function() {
                 var bootScreen = document.getElementById('bootScreen');
                 if (bootScreen) {
@@ -599,15 +599,14 @@
                         if (appContainer) {
                             appContainer.style.display = 'block';
                         }
-                        initSupabase();
+                        checkSession();
                     }, 800);
                 }
             }, 2500);
             
-            // Start clock immediately
             updateTime();
             setInterval(updateTime, 1000);
-        })();
+        }
 
         function updateTime() {
             var now = new Date();
@@ -621,17 +620,6 @@
             }
         }
 
-        function initSupabase() {
-            try {
-                supabase = window.supabase.createClient(SUPABASE_URL, SERVICE_KEY);
-                checkSession();
-            } catch(e) {
-                console.log('Supabase init error:', e);
-                showLogin();
-                setupEventListeners();
-            }
-        }
-
         function checkSession() {
             var saved = localStorage.getItem('hcm_user');
             if (saved) {
@@ -642,7 +630,6 @@
                 } catch(e) {}
             }
             showLogin();
-            setupEventListeners();
         }
 
         function showLogin() {
@@ -685,40 +672,90 @@
             loadStatus();
         }
 
-        function setupEventListeners() {
-            var loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.onsubmit = handleLogin;
+        function doLogin() {
+            var email = document.getElementById('loginEmail').value;
+            var password = document.getElementById('loginPassword').value;
+            var btn = document.getElementById('loginBtn');
+            
+            if (!email || !password) {
+                showMessage('loginMessage', 'error', 'Please fill in all fields');
+                return;
             }
-            var eodForm = document.getElementById('eodForm');
-            if (eodForm) {
-                eodForm.onsubmit = handleEodSubmit;
+            
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Signing in...';
             }
-            var clientForm = document.getElementById('clientForm');
-            if (clientForm) {
-                clientForm.onsubmit = handleClientSubmit;
-            }
-            var registerForm = document.getElementById('registerForm');
-            if (registerForm) {
-                registerForm.onsubmit = handleRegister;
-            }
-            var regularOption = document.getElementById('typeRegularOption');
-            var managerOption = document.getElementById('typeManagerOption');
-            if (regularOption) {
-                regularOption.onclick = function() {
-                    var radios = document.getElementsByName('regType');
-                    for (var i = 0; i < radios.length; i++) {
-                        if (radios[i].value === 'regular') radios[i].checked = true;
+            
+            supabase.from('employees').select('*').eq('email', email).single().then(function(result) {
+                if (result.error || result.data.password !== password) {
+                    showMessage('loginMessage', 'error', 'Invalid email or password');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = 'Sign In';
                     }
-                    this.classList.add('selected');
-                    if (managerOption) managerOption.classList.remove('selected');
-                };
+                    return;
+                }
+                
+                currentUser = { id: result.data.id, email: result.data.email, fullName: result.data.name, type: result.data.type };
+                localStorage.setItem('hcm_user', JSON.stringify(currentUser));
+                showAttendance();
+                showMessage('loginMessage', 'success', 'Welcome back, ' + result.data.name + '!');
+            }).catch(function(error) {
+                showMessage('loginMessage', 'error', error.message);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Sign In';
+                }
+            });
+        }
+
+        function doRegister() {
+            var name = document.getElementById('regName').value;
+            var email = document.getElementById('regEmail').value;
+            var password = document.getElementById('regPassword').value;
+            var btn = document.getElementById('registerBtn');
+            
+            if (!name || !email || !password) {
+                showMessage('loginMessage', 'error', 'Please fill in all fields');
+                return;
             }
-            if (managerOption) {
-                managerOption.onclick = function() {
-                    var radios = document.getElementsByName('regType');
-                    for (var i = 0; i < radios.length; i++) {
-                        if (radios[i].value === 'manager') radios[i].checked = true;
+            
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Creating...';
+            }
+            
+            supabase.from('employees').insert({ name: name, email: email, password: password, type: selectedRegType }).then(function(result) {
+                if (result.error) {
+                    showMessage('loginMessage', 'error', 'Registration failed: ' + result.error.message);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = 'Create Account';
                     }
-                    this.classList.add('selected');
-                    if (regularOption) regularOption.classList.remove('
+                    return;
+                }
+                
+                currentUser = { id: 'new-' + Date.now(), email: email, fullName: name, type: selectedRegType };
+                localStorage.setItem('hcm_user', JSON.stringify(currentUser));
+                
+                closeRegisterModal();
+                document.getElementById('regName').value = '';
+                document.getElementById('regEmail').value = '';
+                document.getElementById('regPassword').value = '';
+                
+                showAttendance();
+                showMessage('attendanceMessage', 'success', 'Welcome, ' + name + '!');
+            }).catch(function(error) {
+                showMessage('loginMessage', 'error', 'Registration failed: ' + error.message);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Create Account';
+                }
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('hcm_user');
+            currentUser = null;
+            currentAttendanceId = null
