@@ -600,14 +600,19 @@
             // Show boot for 2.5 seconds then transition
             setTimeout(function() {
                 var bootScreen = document.getElementById('bootScreen');
-                bootScreen.style.transition = 'opacity 0.8s ease';
-                bootScreen.style.opacity = '0';
-                
-                setTimeout(function() {
-                    bootScreen.style.display = 'none';
-                    document.getElementById('appContainer').style.display = 'block';
-                    initSupabase();
-                }, 800);
+                if (bootScreen) {
+                    bootScreen.style.transition = 'opacity 0.8s ease';
+                    bootScreen.style.opacity = '0';
+                    
+                    setTimeout(function() {
+                        bootScreen.style.display = 'none';
+                        var appContainer = document.getElementById('appContainer');
+                        if (appContainer) {
+                            appContainer.style.display = 'block';
+                        }
+                        initSupabase();
+                    }, 800);
+                }
             }, 2500);
             
             // Start clock immediately
@@ -652,26 +657,41 @@
         }
 
         function showLogin() {
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('attendanceSection').style.display = 'none';
-            document.getElementById('userSection').style.display = 'none';
+            var loginSection = document.getElementById('loginSection');
+            var attendanceSection = document.getElementById('attendanceSection');
+            var userSection = document.getElementById('userSection');
+            
+            if (loginSection) loginSection.style.display = 'block';
+            if (attendanceSection) attendanceSection.style.display = 'none';
+            if (userSection) userSection.style.display = 'none';
         }
 
         function showAttendance() {
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('attendanceSection').style.display = 'block';
-            document.getElementById('userSection').style.display = 'flex';
+            var loginSection = document.getElementById('loginSection');
+            var attendanceSection = document.getElementById('attendanceSection');
+            var userSection = document.getElementById('userSection');
+            
+            if (loginSection) loginSection.style.display = 'none';
+            if (attendanceSection) attendanceSection.style.display = 'block';
+            if (userSection) userSection.style.display = 'flex';
             
             var fullName = currentUser?.fullName || 'Team Member';
             var role = currentUser?.type || 'employee';
             var initial = fullName.charAt(0).toUpperCase();
             
-            document.getElementById('userNameDisplay').textContent = fullName;
-            document.getElementById('userRoleDisplay').textContent = role.toUpperCase();
-            document.getElementById('userAvatarDisplay').textContent = initial;
-            document.getElementById('attendanceName').textContent = fullName;
-            document.getElementById('attendanceAvatar').textContent = initial;
-            document.getElementById('attendanceRole').textContent = role.toUpperCase();
+            var userNameDisplay = document.getElementById('userNameDisplay');
+            var userRoleDisplay = document.getElementById('userRoleDisplay');
+            var userAvatarDisplay = document.getElementById('userAvatarDisplay');
+            var attendanceName = document.getElementById('attendanceName');
+            var attendanceAvatar = document.getElementById('attendanceAvatar');
+            var attendanceRole = document.getElementById('attendanceRole');
+            
+            if (userNameDisplay) userNameDisplay.textContent = fullName;
+            if (userRoleDisplay) userRoleDisplay.textContent = role.toUpperCase();
+            if (userAvatarDisplay) userAvatarDisplay.textContent = initial;
+            if (attendanceName) attendanceName.textContent = fullName;
+            if (attendanceAvatar) attendanceAvatar.textContent = initial;
+            if (attendanceRole) attendanceRole.textContent = role.toUpperCase();
             
             loadStatus();
         }
@@ -701,17 +721,19 @@
             var managerOption = document.getElementById('typeManagerOption');
             if (regularOption && !regularOption.dataset.setup) {
                 regularOption.addEventListener('click', function() {
-                    document.querySelector('input[name="regType"][value="regular"]').checked = true;
+                    var radio = document.querySelector('input[name="regType"][value="regular"]');
+                    if (radio) radio.checked = true;
                     this.classList.add('selected');
-                    managerOption.classList.remove('selected');
+                    if (managerOption) managerOption.classList.remove('selected');
                 });
                 regularOption.dataset.setup = 'true';
             }
             if (managerOption && !managerOption.dataset.setup) {
                 managerOption.addEventListener('click', function() {
-                    document.querySelector('input[name="regType"][value="manager"]').checked = true;
+                    var radio = document.querySelector('input[name="regType"][value="manager"]');
+                    if (radio) radio.checked = true;
                     this.classList.add('selected');
-                    regularOption.classList.remove('selected');
+                    if (regularOption) regularOption.classList.remove('selected');
                 });
                 managerOption.dataset.setup = 'true';
             }
@@ -723,8 +745,8 @@
             var password = document.getElementById('loginPassword').value;
             var btn = document.getElementById('loginBtn');
             var btnText = document.getElementById('loginBtnText');
-            btn.disabled = true;
-            btnText.textContent = 'Signing in...';
+            if (btn) btn.disabled = true;
+            if (btnText) btnText.textContent = 'Signing in...';
             
             try {
                 var result = await supabase.from('employees').select('*').eq('email', email).single();
@@ -740,8 +762,8 @@
                 
             } catch(error) {
                 showMessage('loginMessage', 'error', error.message);
-                btn.disabled = false;
-                btnText.textContent = 'Sign In';
+                if (btn) btn.disabled = false;
+                if (btnText) btnText.textContent = 'Sign In';
             }
         }
 
@@ -750,10 +772,12 @@
             var name = document.getElementById('regName').value;
             var email = document.getElementById('regEmail').value;
             var password = document.getElementById('regPassword').value;
-            var type = document.querySelector('input[name="regType"]:checked').value;
+            var type = document.querySelector('input[name="regType"]:checked')?.value || 'regular';
             var btn = document.getElementById('registerBtn');
-            btn.disabled = true;
-            btn.textContent = 'Creating...';
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Creating...';
+            }
             
             try {
                 var result = await supabase.from('employees').insert({ name: name, email: email, password: password, type: type });
@@ -764,14 +788,17 @@
                 localStorage.setItem('hcm_user', JSON.stringify(currentUser));
                 
                 closeRegisterModal();
-                document.getElementById('registerForm').reset();
+                var registerForm = document.getElementById('registerForm');
+                if (registerForm) registerForm.reset();
                 showAttendance();
                 showMessage('attendanceMessage', 'success', 'Welcome, ' + name + '!');
                 
             } catch(error) {
                 showMessage('loginMessage', 'error', 'Registration failed: ' + error.message);
-                btn.disabled = false;
-                btn.textContent = 'Create Account';
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Create Account';
+                }
             }
         }
 
@@ -785,4 +812,164 @@
 
         async function handleCheckin() {
             if (!currentUser) return showMessage('attendanceMessage', 'error', 'Please login first');
-            var now = new
+            var now = new Date();
+            
+            try {
+                var result = await supabase.from('attendance_records').insert({
+                    employee_name: currentUser.fullName,
+                    check_in_time: now.toISOString(),
+                    status: 'checked_in'
+                }).select().single();
+                
+                if (result.error) throw result.error;
+                
+                currentAttendanceId = result.data.id;
+                showMessage('attendanceMessage', 'success', 'Checked in at ' + now.toLocaleTimeString() + '!');
+                loadStatus();
+                
+            } catch(error) {
+                console.error('Check-in error:', error);
+                showMessage('attendanceMessage', 'error', 'Check-in failed: ' + error.message);
+            }
+        }
+
+        async function handleCheckout() {
+            if (!currentAttendanceId) return showMessage('attendanceMessage', 'error', 'Not checked in');
+            var now = new Date();
+            
+            try {
+                var error = null;
+                try {
+                    var result = await supabase.from('attendance_records').update({
+                        check_out_time: now.toISOString()
+                    }).eq('id', currentAttendanceId);
+                    error = result.error;
+                } catch(err) { error = err; }
+                
+                if (error) throw error;
+                
+                if (currentUser?.type === 'manager') {
+                    showClientModal();
+                } else {
+                    showEodModal();
+                }
+                
+                showMessage('attendanceMessage', 'success', 'Checked out at ' + now.toLocaleTimeString() + '!');
+                currentAttendanceId = null;
+                loadStatus();
+                
+            } catch(error) {
+                showMessage('attendanceMessage', 'error', 'Check-out failed: ' + error.message);
+            }
+        }
+
+        async function loadStatus() {
+            try {
+                var result = await supabase.from('attendance_records')
+                    .select('employee_name, check_in_time, check_out_time')
+                    .order('check_in_time', { ascending: false })
+                    .limit(20);
+                
+                if (result.error) throw result.error;
+                
+                var statusList = document.getElementById('statusList');
+                if (!result.data || result.data.length === 0) {
+                    if (statusList) statusList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">No activity yet</p>';
+                    return;
+                }
+                
+                var today = new Date().toISOString().split('T')[0];
+                var todayData = result.data.filter(function(item) { return item.check_in_time.split('T')[0] === today; });
+                var uniqueNames = [...new Set(todayData.map(function(item) { return item.employee_name; }))];
+                
+                if (statusList) {
+                    statusList.innerHTML = uniqueNames.map(function(name) {
+                        var userData = todayData.find(function(item) { return item.employee_name === name; });
+                        var isActive = !userData.check_out_time;
+                        return '<div class="status-item"><span class="status-name">' + name + '</span><span class="status-badge ' + (isActive ? 'active' : '') + '">' + (isActive ? 'Active' : 'Completed') + '</span></div>';
+                    }).join('');
+                }
+                
+            } catch(error) {
+                console.error('Load status error:', error);
+            }
+        }
+
+        function showMessage(elementId, type, text) {
+            var el = document.getElementById(elementId);
+            if (el) {
+                el.className = 'message show ' + type;
+                el.textContent = text;
+                setTimeout(function() { el.className = 'message'; }, 5000);
+            }
+        }
+
+        function showEodModal() { document.getElementById('eodModal').classList.add('show'); }
+        function closeEodModal() { document.getElementById('eodModal').classList.remove('show'); }
+        function showClientModal() {
+            clientCount = 0;
+            document.getElementById('clientBoxes').innerHTML = '';
+            addClientBox();
+            document.getElementById('clientModal').classList.add('show');
+        }
+        function closeClientModal() { document.getElementById('clientModal').classList.remove('show'); }
+        function showRegisterModal() { document.getElementById('registerModal').classList.add('show'); }
+        function closeRegisterModal() { document.getElementById('registerModal').classList.remove('show'); }
+
+        function addClientBox() {
+            clientCount++;
+            var div = document.createElement('div');
+            div.className = 'form-group';
+            div.innerHTML = '<label class="form-label">Client ' + clientCount + '</label><input type="text" class="form-input" id="clientName' + clientCount + '" placeholder="Client name"><textarea class="form-input" id="clientReport' + clientCount + '" placeholder="Report..." style="margin-top: 8px;"></textarea>';
+            document.getElementById('clientBoxes').appendChild(div);
+        }
+
+        async function handleEodSubmit(e) {
+            e.preventDefault();
+            try {
+                await supabase.from('eod_reports').insert({
+                    employee_name: currentUser.fullName,
+                    videos_done: document.getElementById('eodAccomplishments').value,
+                    revisions_done: document.getElementById('eodRevisionsDone').value,
+                    new_videos_count: parseInt(document.getElementById('eodNewVideosCount').value) || 0
+                });
+                closeEodModal();
+                document.getElementById('eodForm').reset();
+                showMessage('attendanceMessage', 'success', 'EOD Report submitted!');
+            } catch(error) {
+                showMessage('attendanceMessage', 'error', 'Failed: ' + error.message);
+            }
+        }
+
+        async function handleClientSubmit(e) {
+            e.preventDefault();
+            var reports = [];
+            for (var i = 1; i <= clientCount; i++) {
+                var cName = document.getElementById('clientName' + i)?.value;
+                var cReport = document.getElementById('clientReport' + i)?.value;
+                if (cName && cReport) reports.push({ name: cName, report: cReport });
+            }
+            if (reports.length === 0) return alert('Add at least one client');
+            
+            try {
+                for (var j = 0; j < reports.length; j++) {
+                    var r = reports[j];
+                    await supabase.from('client_reports').insert({
+                        employee_name: currentUser.fullName,
+                        client_name: r.name,
+                        report: r.report
+                    });
+                }
+                closeClientModal();
+                document.getElementById('clientBoxes').innerHTML = '';
+                showMessage('attendanceMessage', 'success', 'Client reports submitted!');
+            } catch(error) {
+                showMessage('attendanceMessage', 'error', 'Failed: ' + error.message);
+            }
+        }
+
+        // Start the boot sequence
+        startBoot();
+    </script>
+</body>
+</html>
