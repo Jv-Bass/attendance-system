@@ -435,7 +435,7 @@
                     </div>
                 </div>
                 <div id="loginMessage" class="message"></div>
-                <form id="loginForm">
+                <form id="loginForm" onsubmit="event.preventDefault(); handleLogin(event);">
                     <div class="form-group">
                         <label class="form-label">EMAIL ADDRESS</label>
                         <input type="email" class="form-input" id="loginEmail" placeholder="Enter your email" required>
@@ -444,7 +444,7 @@
                         <label class="form-label">PASSWORD</label>
                         <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary" id="loginBtn"><span id="loginBtnText">Sign In</span></button>
+                    <button type="button" class="btn btn-primary" id="loginBtn" onclick="handleLogin(event)"><span id="loginBtnText">Sign In</span></button>
                 </form>
                 <div class="links">
                     <a href="#" onclick="showRegisterModal(); return false;">New Team Member? Register Here</a>
@@ -496,7 +496,7 @@
                 <button class="modal-close" onclick="closeEodModal()">×</button>
             </div>
             <div class="modal-body">
-                <form id="eodForm">
+                <form id="eodForm" onsubmit="event.preventDefault(); handleEodSubmit(event);">
                     <div class="form-group">
                         <label class="form-label">WHAT DID YOU ACCOMPLISH?</label>
                         <textarea class="form-input" id="eodAccomplishments" required placeholder="List your accomplishments..."></textarea>
@@ -522,7 +522,7 @@
                 <button class="modal-close" onclick="closeClientModal()">×</button>
             </div>
             <div class="modal-body">
-                <form id="clientForm">
+                <form id="clientForm" onsubmit="event.preventDefault(); handleClientSubmit(event);">
                     <div id="clientBoxes"></div>
                     <button type="button" class="submit-modal-btn" style="background: var(--hcm-panel); border: 1px solid var(--hcm-border); color: #94a3b8; margin-bottom: 12px;" onclick="addClientBox()">+ Add Client</button>
                     <button type="submit" class="submit-modal-btn">Submit Reports</button>
@@ -538,7 +538,7 @@
                 <button class="modal-close" onclick="closeRegisterModal()">×</button>
             </div>
             <div class="modal-body">
-                <form id="registerForm">
+                <form id="registerForm" onsubmit="event.preventDefault(); handleRegister(event);">
                     <div class="form-group">
                         <label class="form-label">FULL NAME *</label>
                         <input type="text" class="form-input" id="regName" required placeholder="Enter your full name">
