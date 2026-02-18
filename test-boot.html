@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test</title>
+</head>
+<body>
+    <div id="bootScreen">
+        <div class="boot-logo-text">HCM</div>
+        <div class="boot-status">Initializing System</div>
+    </div>
+    <div id="appContainer" style="display:none;">
+        <h1>Welcome to the App!</h1>
+    </div>
+    <script>
+        function startBoot() {
+            console.log('Boot starting...');
+            setTimeout(function() {
+                document.getElementById('bootScreen').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'block';
+            }, 2000);
+        }
+        startBoot();
+    </script>
+</body>
+</html>
