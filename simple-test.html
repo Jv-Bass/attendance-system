@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HCM Test</title>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #bootScreen { text-align: center; }
+        .logo { font-size: 48px; font-weight: 900; letter-spacing: 8px; color: #2563eb; text-shadow: 0 0 30px rgba(37, 99, 235, 0.8); }
+        .status { margin-top: 20px; color: #94a3b8; letter-spacing: 3px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <div id="bootScreen">
+        <div class="logo">HCM</div>
+        <div class="status">Initializing System</div>
+    </div>
+    <script>
+        console.log('Script starting...');
+        setTimeout(function() {
+            console.log('Timeout reached, hiding boot...');
+            document.getElementById('bootScreen').style.display = 'none';
+            document.body.innerHTML = '<h1>Welcome to HCM!</h1>';
+        }, 2000);
+        console.log('Script ended');
+    </script>
+</body>
+</html>
