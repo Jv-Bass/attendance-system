@@ -758,4 +758,153 @@
         function logout() {
             localStorage.removeItem('hcm_user');
             currentUser = null;
-            currentAttendanceId = null
+            currentAttendanceId = null;
+            showLogin();
+            showMessage('loginMessage', 'info', 'Logged out');
+        }
+
+        function doCheckin() {
+            if (!currentUser) {
+                showMessage('attendanceMessage', 'error', 'Please login first');
+                return;
+            }
+            var now = new Date();
+            supabase.from('attendance_records').insert({
+                employee_name: currentUser.fullName,
+                check_in_time: now.toISOString(),
+                status: 'checked_in'
+            }).select().then(function(result) {
+                if (result.error) {
+                    showMessage('attendanceMessage', 'error', 'Check-in failed: ' + result.error.message);
+                    return;
+                }
+                currentAttendanceId = result.data.id;
+                showMessage('attendanceMessage', 'success', 'Checked in at ' + now.toLocaleTimeString() + '!');
+                loadStatus();
+            });
+        }
+
+        function doCheckout() {
+            if (!currentAttendanceId) {
+                showMessage('attendanceMessage', 'error', 'Not checked in');
+                return;
+            }
+            var now = new Date();
+            supabase.from('attendance_records').update({ check_out_time: now.toISOString() }).eq('id', currentAttendanceId).then(function(result) {
+                if (result.error) {
+                    showMessage('attendanceMessage', 'error', 'Check-out failed: ' + result.error.message);
+                    return;
+                }
+                if (currentUser && currentUser.type === 'manager') {
+                    showClientModal();
+                } else {
+                    showEodModal();
+                }
+                showMessage('attendanceMessage', 'success', 'Checked out at ' + now.toLocaleTimeString() + '!');
+                currentAttendanceId = null;
+                loadStatus();
+            });
+        }
+
+        function loadStatus() {
+            supabase.from('attendance_records').select('employee_name, check_in_time, check_out_time').order('check_in_time', { ascending: false }).limit(20).then(function(result) {
+                if (result.error) {
+                    console.error('Load status error:', result.error);
+                    return;
+                }
+                var statusList = document.getElementById('statusList');
+                if (!result.data || result.data.length === 0) {
+                    if (statusList) statusList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">No activity yet</p>';
+                    return;
+                }
+                var today = new Date().toISOString().split('T')[0];
+                var todayData = result.data.filter(function(item) { return item.check_in_time.split('T')[0] === today; });
+                var uniqueNames = [...new Set(todayData.map(function(item) { return item.employee_name; }))];
+                if (statusList) {
+                    statusList.innerHTML = uniqueNames.map(function(name) {
+                        var userData = todayData.find(function(item) { return item.employee_name === name; });
+                        var isActive = !userData.check_out_time;
+                        return '<div class="status-item"><span class="status-name">' + name + '</span><span class="status-badge ' + (isActive ? 'active' : '') + '">' + (isActive ? 'Active' : 'Completed') + '</span></div>';
+                    }).join('');
+                }
+            });
+        }
+
+        function showMessage(elementId, type, text) {
+            var el = document.getElementById(elementId);
+            if (el) {
+                el.className = 'message show ' + type;
+                el.textContent = text;
+                setTimeout(function() { el.className = 'message'; }, 5000);
+            }
+        }
+
+        function showEodModal() { document.getElementById('eodModal').classList.add('show'); }
+        function closeEodModal() { document.getElementById('eodModal').classList.remove('show'); }
+        function showClientModal() {
+            clientCount = 0;
+            document.getElementById('clientBoxes').innerHTML = '';
+            addClientBox();
+            document.getElementById('clientModal').classList.add('show');
+        }
+        function closeClientModal() { document.getElementById('clientModal').classList.remove('show'); }
+        function showRegisterModal() { document.getElementById('registerModal').classList.add('show'); }
+        function closeRegisterModal() { document.getElementById('registerModal').classList.remove('show'); }
+        function selectRole(type) {
+            selectedRegType = type;
+            document.getElementById('typeRegularOption').classList.toggle('selected', type === 'regular');
+            document.getElementById('typeManagerOption').classList.toggle('selected', type === 'manager');
+        }
+
+        function addClientBox() {
+            clientCount++;
+            var div = document.createElement('div');
+            div.className = 'form-group';
+            div.innerHTML = '<label class="form-label">Client ' + clientCount + '</label><input type="text" class="form-input" id="clientName' + clientCount + '" placeholder="Client name"><textarea class="form-input" id="clientReport' + clientCount + '" placeholder="Report..." style="margin-top: 8px;"></textarea>';
+            document.getElementById('clientBoxes').appendChild(div);
+        }
+
+        function submitEod() {
+            supabase.from('eod_reports').insert({
+                employee_name: currentUser.fullName,
+                videos_done: document.getElementById('eodAccomplishments').value,
+                revisions_done: document.getElementById('eodRevisionsDone').value,
+                new_videos_count: parseInt(document.getElementById('eodNewVideosCount').value) || 0
+            }).then(function() {
+                closeEodModal();
+                document.getElementById('eodAccomplishments').value = '';
+                document.getElementById('eodRevisionsDone').value = '';
+                document.getElementById('eodNewVideosCount').value = '';
+                showMessage('attendanceMessage', 'success', 'EOD Report submitted!');
+            });
+        }
+
+        function submitClientReports() {
+            var reports = [];
+            for (var i = 1; i <= clientCount; i++) {
+                var cName = document.getElementById('clientName' + i)?.value;
+                var cReport = document.getElementById('clientReport' + i)?.value;
+                if (cName && cReport) reports.push({ name: cName, report: cReport });
+            }
+            if (reports.length === 0) return alert('Add at least one client');
+            
+            var promises = reports.map(function(r) {
+                return supabase.from('client_reports').insert({
+                    employee_name: currentUser.fullName,
+                    client_name: r.name,
+                    report: r.report
+                });
+            });
+            
+            Promise.all(promises).then(function() {
+                closeClientModal();
+                document.getElementById('clientBoxes').innerHTML = '';
+                showMessage('attendanceMessage', 'success', 'Client reports submitted!');
+            });
+        }
+
+        // Start the boot sequence
+        startBoot();
+    </script>
+</body>
+</html>
