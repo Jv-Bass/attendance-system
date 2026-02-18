@@ -36,6 +36,7 @@
             justify-content: center;
             align-items: center;
             z-index: 99999;
+            transition: opacity 0.8s ease;
         }
         .boot-logo-container {
             position: relative;
@@ -80,19 +81,12 @@
             text-shadow: 0 0 30px rgba(37, 99, 235, 0.8), 0 0 60px rgba(37, 99, 235, 0.4);
             animation: pulse 2s ease-in-out infinite;
         }
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes pulse {
             0%, 100% { opacity: 0.8; text-shadow: 0 0 30px rgba(37, 99, 235, 0.6); }
             50% { opacity: 1; text-shadow: 0 0 50px rgba(37, 99, 235, 1), 0 0 100px rgba(37, 99, 235, 0.6); }
         }
-        .boot-loading {
-            margin-top: 40px;
-            display: flex;
-            gap: 10px;
-        }
+        .boot-loading { margin-top: 40px; display: flex; gap: 10px; }
         .boot-loading span {
             width: 12px;
             height: 12px;
@@ -119,10 +113,7 @@
             text-transform: uppercase;
             animation: blink 1s infinite;
         }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         
         #appContainer { display: none; min-height: 100vh; }
         
@@ -585,25 +576,23 @@
 
     <script>
         // Service role key - bypasses RLS
-        const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bm5wdmVweXl1dHJ4c25oemt1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMTE0OTg0MywiZXhwIjoyMDg2NzI1ODQzfQ.THXsMBNZ496G6Vj8GA7q5uEUpjE8WM994sA_K8VhLfQ';
-        const SUPABASE_URL = 'https://uwnnpvepyyutrxsnhzku.supabase.co';
+        var SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bm5wdmVweXl1dHJ4c25oemt1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMTE0OTg0MywiZXhwIjoyMDg2NzI1ODQzfQ.THXsMBNZ496G6Vj8GA7q5uEUpjE8WM994sA_K8VhLfQ';
+        var SUPABASE_URL = 'https://uwnnpvepyyutrxsnhzku.supabase.co';
 
-        let currentUser = null;
-        let currentAttendanceId = null;
-        let clientCount = 0;
-        let supabase = null;
+        var currentUser = null;
+        var currentAttendanceId = null;
+        var clientCount = 0;
+        var supabase = null;
 
         // BOOT SEQUENCE
-        function startBoot() {
+        (function() {
             console.log('HCM System booting...');
             
             // Show boot for 2.5 seconds then transition
             setTimeout(function() {
                 var bootScreen = document.getElementById('bootScreen');
                 if (bootScreen) {
-                    bootScreen.style.transition = 'opacity 0.8s ease';
                     bootScreen.style.opacity = '0';
-                    
                     setTimeout(function() {
                         bootScreen.style.display = 'none';
                         var appContainer = document.getElementById('appContainer');
@@ -618,7 +607,7 @@
             // Start clock immediately
             updateTime();
             setInterval(updateTime, 1000);
-        }
+        })();
 
         function updateTime() {
             var now = new Date();
@@ -675,8 +664,8 @@
             if (attendanceSection) attendanceSection.style.display = 'block';
             if (userSection) userSection.style.display = 'flex';
             
-            var fullName = currentUser?.fullName || 'Team Member';
-            var role = currentUser?.type || 'employee';
+            var fullName = currentUser ? currentUser.fullName : 'Team Member';
+            var role = currentUser ? currentUser.type : 'employee';
             var initial = fullName.charAt(0).toUpperCase();
             
             var userNameDisplay = document.getElementById('userNameDisplay');
@@ -698,278 +687,38 @@
 
         function setupEventListeners() {
             var loginForm = document.getElementById('loginForm');
-            if (loginForm && !loginForm.dataset.setup) {
-                loginForm.addEventListener('submit', handleLogin);
-                loginForm.dataset.setup = 'true';
+            if (loginForm) {
+                loginForm.onsubmit = handleLogin;
             }
             var eodForm = document.getElementById('eodForm');
-            if (eodForm && !eodForm.dataset.setup) {
-                eodForm.addEventListener('submit', handleEodSubmit);
-                eodForm.dataset.setup = 'true';
+            if (eodForm) {
+                eodForm.onsubmit = handleEodSubmit;
             }
             var clientForm = document.getElementById('clientForm');
-            if (clientForm && !clientForm.dataset.setup) {
-                clientForm.addEventListener('submit', handleClientSubmit);
-                clientForm.dataset.setup = 'true';
+            if (clientForm) {
+                clientForm.onsubmit = handleClientSubmit;
             }
             var registerForm = document.getElementById('registerForm');
-            if (registerForm && !registerForm.dataset.setup) {
-                registerForm.addEventListener('submit', handleRegister);
-                registerForm.dataset.setup = 'true';
+            if (registerForm) {
+                registerForm.onsubmit = handleRegister;
             }
             var regularOption = document.getElementById('typeRegularOption');
             var managerOption = document.getElementById('typeManagerOption');
-            if (regularOption && !regularOption.dataset.setup) {
-                regularOption.addEventListener('click', function() {
-                    var radio = document.querySelector('input[name="regType"][value="regular"]');
-                    if (radio) radio.checked = true;
+            if (regularOption) {
+                regularOption.onclick = function() {
+                    var radios = document.getElementsByName('regType');
+                    for (var i = 0; i < radios.length; i++) {
+                        if (radios[i].value === 'regular') radios[i].checked = true;
+                    }
                     this.classList.add('selected');
                     if (managerOption) managerOption.classList.remove('selected');
-                });
-                regularOption.dataset.setup = 'true';
+                };
             }
-            if (managerOption && !managerOption.dataset.setup) {
-                managerOption.addEventListener('click', function() {
-                    var radio = document.querySelector('input[name="regType"][value="manager"]');
-                    if (radio) radio.checked = true;
+            if (managerOption) {
+                managerOption.onclick = function() {
+                    var radios = document.getElementsByName('regType');
+                    for (var i = 0; i < radios.length; i++) {
+                        if (radios[i].value === 'manager') radios[i].checked = true;
+                    }
                     this.classList.add('selected');
-                    if (regularOption) regularOption.classList.remove('selected');
-                });
-                managerOption.dataset.setup = 'true';
-            }
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            var email = document.getElementById('loginEmail').value;
-            var password = document.getElementById('loginPassword').value;
-            var btn = document.getElementById('loginBtn');
-            var btnText = document.getElementById('loginBtnText');
-            if (btn) btn.disabled = true;
-            if (btnText) btnText.textContent = 'Signing in...';
-            
-            try {
-                var result = await supabase.from('employees').select('*').eq('email', email).single();
-                
-                if (result.error || result.data.password !== password) {
-                    throw new Error('Invalid email or password');
-                }
-                
-                currentUser = { id: result.data.id, email: result.data.email, fullName: result.data.name, type: result.data.type };
-                localStorage.setItem('hcm_user', JSON.stringify(currentUser));
-                showAttendance();
-                showMessage('loginMessage', 'success', 'Welcome back, ' + result.data.name + '!');
-                
-            } catch(error) {
-                showMessage('loginMessage', 'error', error.message);
-                if (btn) btn.disabled = false;
-                if (btnText) btnText.textContent = 'Sign In';
-            }
-        }
-
-        async function handleRegister(e) {
-            e.preventDefault();
-            var name = document.getElementById('regName').value;
-            var email = document.getElementById('regEmail').value;
-            var password = document.getElementById('regPassword').value;
-            var type = document.querySelector('input[name="regType"]:checked')?.value || 'regular';
-            var btn = document.getElementById('registerBtn');
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = 'Creating...';
-            }
-            
-            try {
-                var result = await supabase.from('employees').insert({ name: name, email: email, password: password, type: type });
-                
-                if (result.error) throw result.error;
-                
-                currentUser = { id: 'new-' + Date.now(), email: email, fullName: name, type: type };
-                localStorage.setItem('hcm_user', JSON.stringify(currentUser));
-                
-                closeRegisterModal();
-                var registerForm = document.getElementById('registerForm');
-                if (registerForm) registerForm.reset();
-                showAttendance();
-                showMessage('attendanceMessage', 'success', 'Welcome, ' + name + '!');
-                
-            } catch(error) {
-                showMessage('loginMessage', 'error', 'Registration failed: ' + error.message);
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = 'Create Account';
-                }
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('hcm_user');
-            currentUser = null;
-            currentAttendanceId = null;
-            showLogin();
-            showMessage('loginMessage', 'info', 'Logged out');
-        }
-
-        async function handleCheckin() {
-            if (!currentUser) return showMessage('attendanceMessage', 'error', 'Please login first');
-            var now = new Date();
-            
-            try {
-                var result = await supabase.from('attendance_records').insert({
-                    employee_name: currentUser.fullName,
-                    check_in_time: now.toISOString(),
-                    status: 'checked_in'
-                }).select().single();
-                
-                if (result.error) throw result.error;
-                
-                currentAttendanceId = result.data.id;
-                showMessage('attendanceMessage', 'success', 'Checked in at ' + now.toLocaleTimeString() + '!');
-                loadStatus();
-                
-            } catch(error) {
-                console.error('Check-in error:', error);
-                showMessage('attendanceMessage', 'error', 'Check-in failed: ' + error.message);
-            }
-        }
-
-        async function handleCheckout() {
-            if (!currentAttendanceId) return showMessage('attendanceMessage', 'error', 'Not checked in');
-            var now = new Date();
-            
-            try {
-                var error = null;
-                try {
-                    var result = await supabase.from('attendance_records').update({
-                        check_out_time: now.toISOString()
-                    }).eq('id', currentAttendanceId);
-                    error = result.error;
-                } catch(err) { error = err; }
-                
-                if (error) throw error;
-                
-                if (currentUser?.type === 'manager') {
-                    showClientModal();
-                } else {
-                    showEodModal();
-                }
-                
-                showMessage('attendanceMessage', 'success', 'Checked out at ' + now.toLocaleTimeString() + '!');
-                currentAttendanceId = null;
-                loadStatus();
-                
-            } catch(error) {
-                showMessage('attendanceMessage', 'error', 'Check-out failed: ' + error.message);
-            }
-        }
-
-        async function loadStatus() {
-            try {
-                var result = await supabase.from('attendance_records')
-                    .select('employee_name, check_in_time, check_out_time')
-                    .order('check_in_time', { ascending: false })
-                    .limit(20);
-                
-                if (result.error) throw result.error;
-                
-                var statusList = document.getElementById('statusList');
-                if (!result.data || result.data.length === 0) {
-                    if (statusList) statusList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">No activity yet</p>';
-                    return;
-                }
-                
-                var today = new Date().toISOString().split('T')[0];
-                var todayData = result.data.filter(function(item) { return item.check_in_time.split('T')[0] === today; });
-                var uniqueNames = [...new Set(todayData.map(function(item) { return item.employee_name; }))];
-                
-                if (statusList) {
-                    statusList.innerHTML = uniqueNames.map(function(name) {
-                        var userData = todayData.find(function(item) { return item.employee_name === name; });
-                        var isActive = !userData.check_out_time;
-                        return '<div class="status-item"><span class="status-name">' + name + '</span><span class="status-badge ' + (isActive ? 'active' : '') + '">' + (isActive ? 'Active' : 'Completed') + '</span></div>';
-                    }).join('');
-                }
-                
-            } catch(error) {
-                console.error('Load status error:', error);
-            }
-        }
-
-        function showMessage(elementId, type, text) {
-            var el = document.getElementById(elementId);
-            if (el) {
-                el.className = 'message show ' + type;
-                el.textContent = text;
-                setTimeout(function() { el.className = 'message'; }, 5000);
-            }
-        }
-
-        function showEodModal() { document.getElementById('eodModal').classList.add('show'); }
-        function closeEodModal() { document.getElementById('eodModal').classList.remove('show'); }
-        function showClientModal() {
-            clientCount = 0;
-            document.getElementById('clientBoxes').innerHTML = '';
-            addClientBox();
-            document.getElementById('clientModal').classList.add('show');
-        }
-        function closeClientModal() { document.getElementById('clientModal').classList.remove('show'); }
-        function showRegisterModal() { document.getElementById('registerModal').classList.add('show'); }
-        function closeRegisterModal() { document.getElementById('registerModal').classList.remove('show'); }
-
-        function addClientBox() {
-            clientCount++;
-            var div = document.createElement('div');
-            div.className = 'form-group';
-            div.innerHTML = '<label class="form-label">Client ' + clientCount + '</label><input type="text" class="form-input" id="clientName' + clientCount + '" placeholder="Client name"><textarea class="form-input" id="clientReport' + clientCount + '" placeholder="Report..." style="margin-top: 8px;"></textarea>';
-            document.getElementById('clientBoxes').appendChild(div);
-        }
-
-        async function handleEodSubmit(e) {
-            e.preventDefault();
-            try {
-                await supabase.from('eod_reports').insert({
-                    employee_name: currentUser.fullName,
-                    videos_done: document.getElementById('eodAccomplishments').value,
-                    revisions_done: document.getElementById('eodRevisionsDone').value,
-                    new_videos_count: parseInt(document.getElementById('eodNewVideosCount').value) || 0
-                });
-                closeEodModal();
-                document.getElementById('eodForm').reset();
-                showMessage('attendanceMessage', 'success', 'EOD Report submitted!');
-            } catch(error) {
-                showMessage('attendanceMessage', 'error', 'Failed: ' + error.message);
-            }
-        }
-
-        async function handleClientSubmit(e) {
-            e.preventDefault();
-            var reports = [];
-            for (var i = 1; i <= clientCount; i++) {
-                var cName = document.getElementById('clientName' + i)?.value;
-                var cReport = document.getElementById('clientReport' + i)?.value;
-                if (cName && cReport) reports.push({ name: cName, report: cReport });
-            }
-            if (reports.length === 0) return alert('Add at least one client');
-            
-            try {
-                for (var j = 0; j < reports.length; j++) {
-                    var r = reports[j];
-                    await supabase.from('client_reports').insert({
-                        employee_name: currentUser.fullName,
-                        client_name: r.name,
-                        report: r.report
-                    });
-                }
-                closeClientModal();
-                document.getElementById('clientBoxes').innerHTML = '';
-                showMessage('attendanceMessage', 'success', 'Client reports submitted!');
-            } catch(error) {
-                showMessage('attendanceMessage', 'error', 'Failed: ' + error.message);
-            }
-        }
-
-        // Start the boot sequence
-        startBoot();
-    </script>
-</body>
-</html>
+                    if (regularOption) regularOption.classList.remove('
