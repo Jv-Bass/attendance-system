@@ -699,7 +699,7 @@
             loadStatus();
         }
 
-        function doLogin() {
+        async function doLogin() {
             var email = document.getElementById('loginEmail').value;
             var password = document.getElementById('loginPassword').value;
             var btn = document.getElementById('loginBtn');
@@ -716,27 +716,43 @@
                 btn.textContent = 'Signing in...';
             }
 
-            dbClient.from('employees').select('*').eq('email', email).single().then(function(result) {
-                if (result.error || !result.data || result.data.password !== password) {
-                    showMessage('loginMessage', 'error', 'Invalid email or password');
+            try {
+                var result = await dbClient.from('employees').select('*').eq('email', email).single();
+
+                if (result.error && result.error.message && result.error.message.indexOf("'email' column") !== -1) {
+                    result = await dbClient.from('employees').select('*').eq('name', email).single();
+                }
+
+                if (result.error || !result.data) {
+                    showMessage('loginMessage', 'error', 'Invalid credentials');
                     return;
                 }
 
-                currentUser = { id: result.data.id, email: result.data.email, fullName: result.data.name, type: result.data.type };
+                if (typeof result.data.password !== 'undefined' && result.data.password !== password) {
+                    showMessage('loginMessage', 'error', 'Invalid credentials');
+                    return;
+                }
+
+                currentUser = {
+                    id: result.data.id,
+                    email: result.data.email || email,
+                    fullName: result.data.name,
+                    type: result.data.type
+                };
                 localStorage.setItem('hcm_user', JSON.stringify(currentUser));
                 showAttendance();
                 showMessage('loginMessage', 'success', 'Welcome back, ' + result.data.name + '!');
-            }).catch(function(error) {
+            } catch (error) {
                 showMessage('loginMessage', 'error', error.message);
-            }).finally(function() {
+            } finally {
                 if (btn) {
                     btn.disabled = false;
                     btn.textContent = 'Sign In';
                 }
-            });
+            }
         }
 
-        function doRegister() {
+        async function doRegister() {
             var name = document.getElementById('regName').value;
             var email = document.getElementById('regEmail').value;
             var password = document.getElementById('regPassword').value;
@@ -754,7 +770,15 @@
                 btn.textContent = 'Creating...';
             }
 
-            dbClient.from('employees').insert({ name: name, email: email, password: password, type: selectedRegType }).select().single().then(function(result) {
+            try {
+                var payload = { name: name, email: email, password: password, type: selectedRegType };
+                var result = await dbClient.from('employees').insert(payload).select().single();
+
+                if (result.error && result.error.message && result.error.message.indexOf("'email' column") !== -1) {
+                    payload = { name: name, type: selectedRegType, role: selectedRegType === 'manager' ? 'Manager' : 'Employee' };
+                    result = await dbClient.from('employees').insert(payload).select().single();
+                }
+
                 if (result.error) {
                     showMessage('loginMessage', 'error', 'Registration failed: ' + result.error.message);
                     return;
@@ -770,14 +794,14 @@
 
                 showAttendance();
                 showMessage('attendanceMessage', 'success', 'Welcome, ' + name + '!');
-            }).catch(function(error) {
+            } catch (error) {
                 showMessage('loginMessage', 'error', 'Registration failed: ' + error.message);
-            }).finally(function() {
+            } finally {
                 if (btn) {
                     btn.disabled = false;
                     btn.textContent = 'Create Account';
                 }
-            });
+            }
         }
 
         function logout() {
