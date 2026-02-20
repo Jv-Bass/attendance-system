@@ -582,7 +582,7 @@
         var currentUser = null;
         var currentAttendanceId = null;
         var clientCount = 0;
-        var supabase = null;
+        var dbClient = null;
         var selectedRegType = 'regular';
 
         // Initialize Supabase
@@ -596,15 +596,15 @@
                     }
                     throw new Error('Supabase library unavailable');
                 }
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } catch(e) {
-                supabase = null;
+                dbClient = null;
                 console.log('Supabase init error:', e);
             }
         }
 
         function ensureSupabaseClient(messageElementId) {
-            if (!supabase) {
+            if (!dbClient) {
                 showMessage(messageElementId || 'loginMessage', 'error', 'Database client unavailable. Please refresh and try again.');
                 return false;
             }
@@ -716,7 +716,7 @@
                 btn.textContent = 'Signing in...';
             }
 
-            supabase.from('employees').select('*').eq('email', email).single().then(function(result) {
+            dbClient.from('employees').select('*').eq('email', email).single().then(function(result) {
                 if (result.error || !result.data || result.data.password !== password) {
                     showMessage('loginMessage', 'error', 'Invalid email or password');
                     return;
@@ -754,7 +754,7 @@
                 btn.textContent = 'Creating...';
             }
 
-            supabase.from('employees').insert({ name: name, email: email, password: password, type: selectedRegType }).select().single().then(function(result) {
+            dbClient.from('employees').insert({ name: name, email: email, password: password, type: selectedRegType }).select().single().then(function(result) {
                 if (result.error) {
                     showMessage('loginMessage', 'error', 'Registration failed: ' + result.error.message);
                     return;
@@ -795,7 +795,7 @@
             }
             if (!ensureSupabaseClient('attendanceMessage')) return;
             var now = new Date();
-            supabase.from('attendance_records').insert({
+            dbClient.from('attendance_records').insert({
                 employee_name: currentUser.fullName,
                 check_in_time: now.toISOString(),
                 status: 'checked_in'
@@ -819,7 +819,7 @@
             }
             if (!ensureSupabaseClient('attendanceMessage')) return;
             var now = new Date();
-            supabase.from('attendance_records').update({ check_out_time: now.toISOString() }).eq('id', currentAttendanceId).then(function(result) {
+            dbClient.from('attendance_records').update({ check_out_time: now.toISOString() }).eq('id', currentAttendanceId).then(function(result) {
                 if (result.error) {
                     showMessage('attendanceMessage', 'error', 'Check-out failed: ' + result.error.message);
                     return;
@@ -838,13 +838,13 @@
         }
 
         function loadStatus() {
-            if (!supabase) {
+            if (!dbClient) {
                 var statusList = document.getElementById('statusList');
                 if (statusList) statusList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Database unavailable</p>';
                 return;
             }
 
-            supabase.from('attendance_records').select('employee_name, check_in_time, check_out_time').order('check_in_time', { ascending: false }).limit(20).then(function(result) {
+            dbClient.from('attendance_records').select('employee_name, check_in_time, check_out_time').order('check_in_time', { ascending: false }).limit(20).then(function(result) {
                 if (result.error) {
                     console.error('Load status error:', result.error);
                     return;
@@ -902,7 +902,7 @@
         }
 
         function submitEod() {
-            supabase.from('eod_reports').insert({
+            dbClient.from('eod_reports').insert({
                 employee_name: currentUser.fullName,
                 videos_done: document.getElementById('eodAccomplishments').value,
                 revisions_done: document.getElementById('eodRevisionsDone').value,
@@ -926,7 +926,7 @@
             if (reports.length === 0) return alert('Add at least one client');
             
             var promises = reports.map(function(r) {
-                return supabase.from('client_reports').insert({
+                return dbClient.from('client_reports').insert({
                     employee_name: currentUser.fullName,
                     client_name: r.name,
                     report: r.report
