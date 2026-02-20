@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>High Con Marketing - Attendance System</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.__loadSupabaseFallback = function() {
+            if (window.supabase) return;
+            var s = document.createElement('script');
+            s.src = 'https://unpkg.com/@supabase/supabase-js@2';
+            s.defer = true;
+            document.head.appendChild(s);
+        };
+        setTimeout(window.__loadSupabaseFallback, 1200);
+    </script>
     <style>
         :root {
             --hcm-primary: #2563eb;
@@ -576,9 +586,14 @@
         var selectedRegType = 'regular';
 
         // Initialize Supabase
-        function initSupabase() {
+        function initSupabase(retries) {
+            var tries = typeof retries === 'number' ? retries : 8;
             try {
                 if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+                    if (tries > 0) {
+                        setTimeout(function() { initSupabase(tries - 1); }, 500);
+                        return;
+                    }
                     throw new Error('Supabase library unavailable');
                 }
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
