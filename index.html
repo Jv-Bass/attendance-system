@@ -565,8 +565,8 @@
 
     <script>
         // Configuration
-        var SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bm5wdmVweXl1dHJ4c25oemt1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczMTE0OTg0MywiZXhwIjoyMDg2NzI1ODQzfQ.THXsMBNZ496G6Vj8GA7q5uEUpjE8WM994sA_K8VhLfQ';
         var SUPABASE_URL = 'https://uwnnpvepyyutrxsnhzku.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3bm5wdmVweXl1dHJ4c25oemt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzExNDk4NDMsImV4cCI6MjA4NjcyNTg0M30.qbf1dnPQ8srUc2EcwNHNz3HFz3v5_A7gKUS1ZWKV7vM';
 
         // Global variables
         var currentUser = null;
@@ -578,10 +578,22 @@
         // Initialize Supabase
         function initSupabase() {
             try {
-                supabase = window.supabase.createClient(SUPABASE_URL, SERVICE_KEY);
+                if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+                    throw new Error('Supabase library unavailable');
+                }
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } catch(e) {
+                supabase = null;
                 console.log('Supabase init error:', e);
             }
+        }
+
+        function ensureSupabaseClient(messageElementId) {
+            if (!supabase) {
+                showMessage(messageElementId || 'loginMessage', 'error', 'Database client unavailable. Please refresh and try again.');
+                return false;
+            }
+            return true;
         }
 
         // Boot sequence
@@ -676,33 +688,32 @@
             var email = document.getElementById('loginEmail').value;
             var password = document.getElementById('loginPassword').value;
             var btn = document.getElementById('loginBtn');
-            
+
             if (!email || !password) {
                 showMessage('loginMessage', 'error', 'Please fill in all fields');
                 return;
             }
-            
+
+            if (!ensureSupabaseClient('loginMessage')) return;
+
             if (btn) {
                 btn.disabled = true;
                 btn.textContent = 'Signing in...';
             }
-            
+
             supabase.from('employees').select('*').eq('email', email).single().then(function(result) {
-                if (result.error || result.data.password !== password) {
+                if (result.error || !result.data || result.data.password !== password) {
                     showMessage('loginMessage', 'error', 'Invalid email or password');
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.textContent = 'Sign In';
-                    }
                     return;
                 }
-                
+
                 currentUser = { id: result.data.id, email: result.data.email, fullName: result.data.name, type: result.data.type };
                 localStorage.setItem('hcm_user', JSON.stringify(currentUser));
                 showAttendance();
                 showMessage('loginMessage', 'success', 'Welcome back, ' + result.data.name + '!');
             }).catch(function(error) {
                 showMessage('loginMessage', 'error', error.message);
+            }).finally(function() {
                 if (btn) {
                     btn.disabled = false;
                     btn.textContent = 'Sign In';
@@ -715,39 +726,38 @@
             var email = document.getElementById('regEmail').value;
             var password = document.getElementById('regPassword').value;
             var btn = document.getElementById('registerBtn');
-            
+
             if (!name || !email || !password) {
                 showMessage('loginMessage', 'error', 'Please fill in all fields');
                 return;
             }
-            
+
+            if (!ensureSupabaseClient('loginMessage')) return;
+
             if (btn) {
                 btn.disabled = true;
                 btn.textContent = 'Creating...';
             }
-            
-            supabase.from('employees').insert({ name: name, email: email, password: password, type: selectedRegType }).then(function(result) {
+
+            supabase.from('employees').insert({ name: name, email: email, password: password, type: selectedRegType }).select().single().then(function(result) {
                 if (result.error) {
                     showMessage('loginMessage', 'error', 'Registration failed: ' + result.error.message);
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.textContent = 'Create Account';
-                    }
                     return;
                 }
-                
-                currentUser = { id: 'new-' + Date.now(), email: email, fullName: name, type: selectedRegType };
+
+                currentUser = { id: result.data && result.data.id ? result.data.id : ('new-' + Date.now()), email: email, fullName: name, type: selectedRegType };
                 localStorage.setItem('hcm_user', JSON.stringify(currentUser));
-                
+
                 closeRegisterModal();
                 document.getElementById('regName').value = '';
                 document.getElementById('regEmail').value = '';
                 document.getElementById('regPassword').value = '';
-                
+
                 showAttendance();
                 showMessage('attendanceMessage', 'success', 'Welcome, ' + name + '!');
             }).catch(function(error) {
                 showMessage('loginMessage', 'error', 'Registration failed: ' + error.message);
+            }).finally(function() {
                 if (btn) {
                     btn.disabled = false;
                     btn.textContent = 'Create Account';
@@ -768,12 +778,13 @@
                 showMessage('attendanceMessage', 'error', 'Please login first');
                 return;
             }
+            if (!ensureSupabaseClient('attendanceMessage')) return;
             var now = new Date();
             supabase.from('attendance_records').insert({
                 employee_name: currentUser.fullName,
                 check_in_time: now.toISOString(),
                 status: 'checked_in'
-            }).select().then(function(result) {
+            }).select().single().then(function(result) {
                 if (result.error) {
                     showMessage('attendanceMessage', 'error', 'Check-in failed: ' + result.error.message);
                     return;
@@ -781,6 +792,8 @@
                 currentAttendanceId = result.data.id;
                 showMessage('attendanceMessage', 'success', 'Checked in at ' + now.toLocaleTimeString() + '!');
                 loadStatus();
+            }).catch(function(error) {
+                showMessage('attendanceMessage', 'error', 'Check-in failed: ' + error.message);
             });
         }
 
@@ -789,6 +802,7 @@
                 showMessage('attendanceMessage', 'error', 'Not checked in');
                 return;
             }
+            if (!ensureSupabaseClient('attendanceMessage')) return;
             var now = new Date();
             supabase.from('attendance_records').update({ check_out_time: now.toISOString() }).eq('id', currentAttendanceId).then(function(result) {
                 if (result.error) {
@@ -803,10 +817,18 @@
                 showMessage('attendanceMessage', 'success', 'Checked out at ' + now.toLocaleTimeString() + '!');
                 currentAttendanceId = null;
                 loadStatus();
+            }).catch(function(error) {
+                showMessage('attendanceMessage', 'error', 'Check-out failed: ' + error.message);
             });
         }
 
         function loadStatus() {
+            if (!supabase) {
+                var statusList = document.getElementById('statusList');
+                if (statusList) statusList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Database unavailable</p>';
+                return;
+            }
+
             supabase.from('attendance_records').select('employee_name, check_in_time, check_out_time').order('check_in_time', { ascending: false }).limit(20).then(function(result) {
                 if (result.error) {
                     console.error('Load status error:', result.error);
